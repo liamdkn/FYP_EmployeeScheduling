@@ -14,10 +14,13 @@ import 'package:my_app/views/GenerateRosterScreen.dart';
 import 'package:my_app/widgets/navbar.dart';
 
 Future<void> main() async {
-  runApp(const MyApp());
+  WidgetsFlutterBinding
+      .ensureInitialized(); // Ensure that Flutter is initialized
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+
+  runApp(const MyApp());
 }
 
 class MyApp extends StatefulWidget {
@@ -29,6 +32,7 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   final firstNameController = TextEditingController();
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   @override
   Widget build(BuildContext context) {
@@ -45,6 +49,20 @@ class _MyAppState extends State<MyApp> {
             children: [
               Text(
                 'Launch Page',
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  // Retrieve data from Firestore
+                  _firestore
+                      .collection('Employees')
+                      .get()
+                      .then((QuerySnapshot querySnapshot) {
+                    querySnapshot.docs.forEach((doc) {
+                      print(doc.data());
+                    });
+                  });
+                },
+                child: Text('Retrieve Data from Firestore'),
               ),
             ],
           ),
