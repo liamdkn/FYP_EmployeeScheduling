@@ -9,8 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:my_app/firebase_options.dart';
-import 'package:my_app/views/CreateRoster.dart';
-import 'package:my_app/views/GenerateRosterScreen.dart';
+import 'package:my_app/views/roster_create.dart';
 import 'package:my_app/widgets/navbar.dart';
 
 Future<void> main() async {
@@ -49,20 +48,6 @@ class _MyAppState extends State<MyApp> {
             children: [
               Text(
                 'Launch Page',
-              ),
-              ElevatedButton(
-                onPressed: () {
-                  // Retrieve data from Firestore
-                  _firestore
-                      .collection('Employees')
-                      .get()
-                      .then((QuerySnapshot querySnapshot) {
-                    querySnapshot.docs.forEach((doc) {
-                      print(doc.data());
-                    });
-                  });
-                },
-                child: Text('Retrieve Data from Firestore'),
               ),
             ],
           ),

@@ -2,10 +2,9 @@
 * SidenNavBar flutter package sourced from: https://pub.dev/packages/side_navigation
 */
 import 'package:flutter/material.dart';
-import 'package:my_app/views/GenerateRosterScreen.dart';
-import 'package:my_app/views/RegisterEmployee.dart';
+import 'package:my_app/views/employees_view.dart';
 import 'package:side_navigation/side_navigation.dart';
-import 'package:my_app/views/CreateRoster.dart';
+import 'package:my_app/views/roster_create.dart';
 
 class NavBar extends StatefulWidget {
   const NavBar({Key? key}) : super(key: key);
@@ -20,14 +19,14 @@ class _MainViewState extends State<NavBar> {
       child: Text("Home"),
     ),
     Center(
-      child: GenerateRosterScreen(),
-    ),
-    Center(
       child: CreateRoster(),
     ),
     Center(
-      child: RegisterEmployee(),
+      child: Employees(),
     ),
+    Center(
+      child: Text("Settings"),
+    )
   ];
   int selectedIndex = 0;
 
@@ -53,15 +52,15 @@ class _MainViewState extends State<NavBar> {
               ),
               SideNavigationBarItem(
                 icon: Icons.dashboard,
-                label: 'Roster V1',
-              ),
-              SideNavigationBarItem(
-                icon: Icons.settings,
-                label: 'Roster V2',
+                label: 'Create Roster',
               ),
               SideNavigationBarItem(
                 icon: Icons.person,
                 label: 'Employees',
+              ),
+              SideNavigationBarItem(
+                icon: Icons.settings,
+                label: 'Settings',
               ),
             ],
             onTap: (index) {
@@ -78,5 +77,3 @@ class _MainViewState extends State<NavBar> {
     );
   }
 }
-
-class ShiftListWidget {}
