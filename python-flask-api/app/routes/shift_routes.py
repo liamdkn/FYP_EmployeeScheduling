@@ -15,12 +15,24 @@ def get_shifts():
     return jsonify(shifts)
 
 @shift_blueprint.route('/shifts', methods=['POST'])
-def create_shift():
-    shift_data = request.json
-    new_shift_ref = shifts_ref.add(shift_data)
+def create_shifts():
+    try:
+        shifts_data = request.json
 
-    response_data = {
-        "status": "Shift data retrieved successfully",
-        "shift_data": shift_data
-    }
-    return jsonify(response_data), 201
+        all_shifts = []
+        for shift_data in shifts_data:
+            all_shifts.append(shift_data)
+
+        new_shift_ref = shifts_ref.add({'all_shifts': all_shifts})
+
+        response_data = {
+            "status": "Shifts data retrieved successfully",
+            "shifts_data": all_shifts
+        }
+
+        return jsonify(response_data), 201
+
+    except Exception as e:
+        error_message = f"Error creating shifts: {str(e)}"
+        return jsonify({"error": error_message}), 500
+
