@@ -1,11 +1,15 @@
-python-flask-api/app/__init__.py
-python-flask-api/app/__pycache__/__init__.cpython-39.pyc
-python-flask-api/app/routes/__init__.py
-python-flask-api/app/routes/__pycache__/__init__.cpython-39.pyc
-my_app/lib/views/Template.txt
-python-flask-api/__pycache__/app.cpython-39.pyc
-python-flask-api/app/__pycache__/app.cpython-39.pyc
-python-flask-api/__pycache__/app.cpython-39.pyc
-python-flask-api/app/routes/__pycache__/employee_routes.cpython-39.pyc
-python-flask-api/__pycache__/app.cpython-39.pyc
+# Ignore compiled Python files
+*.pyc
+
+# Ignore __pycache__ directories
+__pycache__/
+
+# Ignore system-specific files
 .DS_Store
+
+# Ignore specific files or directories
+my_app/lib/views/Template.txt
+
+# Ignore __init__.py files
+**/__init__.py
+
