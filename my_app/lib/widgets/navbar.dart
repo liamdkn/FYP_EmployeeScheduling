@@ -3,6 +3,7 @@
 */
 import 'package:flutter/material.dart';
 import 'package:my_app/views/employees_view.dart';
+import 'package:my_app/views/user_form.dart';
 import 'package:side_navigation/side_navigation.dart';
 import 'package:my_app/views/roster_create.dart';
 
@@ -23,6 +24,9 @@ class _MainViewState extends State<NavBar> {
     ),
     Center(
       child: Employees(),
+    ),
+    Center(
+      child: UserForm(),
     ),
     Center(
       child: Text("Settings"),
@@ -57,6 +61,10 @@ class _MainViewState extends State<NavBar> {
               SideNavigationBarItem(
                 icon: Icons.person,
                 label: 'Employees',
+              ),
+              SideNavigationBarItem(
+                icon: Icons.person,
+                label: 'User',
               ),
               SideNavigationBarItem(
                 icon: Icons.settings,

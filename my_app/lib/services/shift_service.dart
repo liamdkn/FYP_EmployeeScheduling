@@ -4,11 +4,13 @@ import 'package:my_app/models/shift.dart';
 
 class ShiftService {
   static const String shiftsURI = "http://127.0.0.1:5000/shifts";
-
   Future<void> createShiftsList(List<Shift> shiftData) async {
     try {
       final List<Map<String, dynamic>> shiftsJsonList =
           shiftData.map((shift) => shift.toJson()).toList();
+
+      // Print the JSON data for inspection
+      print('JSON Data: ${jsonEncode(shiftsJsonList)}');
 
       final response = await http.post(
         Uri.parse(shiftsURI),

@@ -77,8 +77,7 @@ class _EmployeesState extends State<Employees> {
                           IconButton(
                             icon: Icon(Icons.edit),
                             onPressed: () {
-                              // Handle edit button click
-                              // You can navigate to the edit employee page here
+                              //fix
                             },
                           ),
                         ],

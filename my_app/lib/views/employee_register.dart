@@ -34,9 +34,6 @@ class _RegisterEmployeeState extends State<RegisterEmployee> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('New Employee'),
-      ),
       body: SingleChildScrollView(
         child: _buildStyledContainer(),
       ),
@@ -45,20 +42,6 @@ class _RegisterEmployeeState extends State<RegisterEmployee> {
 
   Widget _buildStyledContainer() {
     return Container(
-      margin: const EdgeInsets.all(16.0),
-      padding: const EdgeInsets.all(16.0),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(10.0),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.5),
-            spreadRadius: 2,
-            blurRadius: 5,
-            offset: const Offset(0, 3),
-          ),
-        ],
-      ),
       child: FormBuilder(
           key: _formKey,
           autovalidateMode: AutovalidateMode.onUserInteraction,
@@ -169,7 +152,6 @@ class _RegisterEmployeeState extends State<RegisterEmployee> {
         intervals.add('$formattedHour:$formattedMinute');
       }
     }
-
     return intervals;
   }
 }
