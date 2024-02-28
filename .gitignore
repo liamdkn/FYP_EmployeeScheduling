@@ -8,3 +8,4 @@ python-flask-api/app/__pycache__/app.cpython-39.pyc
 python-flask-api/__pycache__/app.cpython-39.pyc
 python-flask-api/app/routes/__pycache__/employee_routes.cpython-39.pyc
 python-flask-api/__pycache__/app.cpython-39.pyc
+.DS_Store
