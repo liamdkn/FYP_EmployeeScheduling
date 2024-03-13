@@ -8,6 +8,5 @@ def get_roster_by_id():
 
 def create_new_roster(shifts_id, employee_ids):
     employee_availability = get_emp_availability_by_id(employee_ids)
-    roster = RosterGeneration(shifts_id, employee_availability)
-
+    roster = generate_roster(shifts_id, employee_availability)
     return roster
