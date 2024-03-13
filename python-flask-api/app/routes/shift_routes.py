@@ -1,7 +1,6 @@
 from flask import Blueprint, jsonify, request
 from flask_cors import CORS
 from app.services.shift_service import get_all_shifts, create_shifts
-from app.scripts.roster_generation import RosterGeneration
 
 shift_blueprint = Blueprint('shift', __name__)
 CORS(shift_blueprint)
