@@ -12,15 +12,13 @@ def get_rosters():
 @roster_blueprint.route('/roster', methods=['POST'])
 def create_roster():
     try:
-        roster_data = request.json
-        print(roster_data)
-        
+        roster_data = request.json        
         shifts_id = roster_data.get('shifts_id')
         employee_ids = roster_data.get('employee_ids')
         
         roster = create_new_roster(shifts_id, employee_ids)
 
-        return "Sucess"
+        return "Sucesses"
     except Exception as e:
         print(f"Exception: {e}")
         return jsonify({'error': 'Internal Server Error'}), 500
