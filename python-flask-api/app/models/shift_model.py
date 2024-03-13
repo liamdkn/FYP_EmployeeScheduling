@@ -14,9 +14,18 @@ class Shift:
         }
 
 class Ind_Shift:
-    def __init__(self, name, day, start_time, end_time, employee=None):
+    def __init__(self, id, name, day, start_time, end_time, employee):
+        self.id = id
         self.name = name
         self.day = day
         self.start_time = start_time
         self.end_time = end_time
         self.employee = employee
+
+    def __str__(self):
+        employee_firstname = self.employee.firstname if self.employee else "None"
+        return f"Ind_Shift(id={self.id}, name={self.name}, day={self.day}, start_time={self.start_time}, end_time={self.end_time}, employee={employee_firstname})"
+
+
+
+
