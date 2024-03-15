@@ -1,11 +1,14 @@
-# /Users/liamdurkan/Repositories/FYP_EmployeeScheduling/python-flask-api/app/models/employee_model.py
+from datetime import time
+
 class Employee:
-    def __init__(self, firstname, lastname, number, email):
-        self.id = None  # Private attribute for storing the ID
+    def __init__(self, document_id, firstname, lastname, number, email, days_per_week, availability):
+        self.id = document_id
         self.firstname = firstname
         self.lastname = lastname
         self.number = number
         self.email = email
+        self.days_per_week = days_per_week
+        self.availability = availability
 
     def to_dict(self):
         return {
@@ -14,23 +17,11 @@ class Employee:
             "lastname": self.lastname,
             "number": self.number,
             "email": self.email,
+            "days_per_week": self.days_per_week,
+            "availability": self.availability
+            
         }
-
-
-class EmployeeAvailability:
-    def __init__(self, employee_id, dayTimeMap, days_per_week):
-        self.employee_id = employee_id
-        self.dayTimeMap = dayTimeMap
-        self.days_per_week = days_per_week
-
-
-    def to_dict(self):
-        return {
-            "employee_id": self.employee_id,
-            "dayTimeMap": self.dayTimeMap,
-            "days_per_week" : self.days_per_week
-        }
-
 
     def __str__(self):
-        return f"EmployeeAvailability(employee_id={self.employee_id}, dayTimeMap={self.dayTimeMap})"
+        return f"Employee(id={self.id}, firstname={self.firstname}, lastname={self.lastname})"
+
