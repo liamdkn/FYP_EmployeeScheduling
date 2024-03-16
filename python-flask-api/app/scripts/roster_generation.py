@@ -46,7 +46,6 @@ def initialise_population(population_size, employees, num_shifts):
     return initial_population
 
 
-
 def calculate_fitness(chromosome, individual_shifts, employees):
     total_shifts = len(chromosome)
     shifts_per_day = {}
@@ -90,12 +89,28 @@ def calculate_fitness(chromosome, individual_shifts, employees):
     return fitness, numberOfConflicts
 
 
+def calculate_inital_fitness(initial_population, individual_shifts, employees):
+    population_with_fitness = []
+    for chromosome in initial_population:
+        fitness, conflicts = calculate_fitness(chromosome, individual_shifts, employees)
+
+        # Map employee IDs to first names
+        employee_names = [next((employee.firstname for employee in employees if employee.id == employee_id), None) for employee_id in chromosome]
+        employee_names = [name for name in employee_names if name is not None]
+        print(f"Employee Names: {employee_names}, Fitness: {fitness}, Conflicts: {conflicts}")
+
+        individual_dict = {'chromosome': chromosome, 'fitness': fitness, 'conflicts': conflicts}
+        population_with_fitness.append(individual_dict)
+    return population_with_fitness
+
+
 def roulette_wheel_selection(population, num_selection):
     total_fitness = sum(individual['fitness'] for individual in population)
     selection_probabilities = [individual['fitness'] / total_fitness for individual in population]
     selected_indices = random.choices(range(len(population)), weights=selection_probabilities, k=num_selection)
     selected_individuals = [population[i] for i in selected_indices]
     return selected_individuals
+
 
 def crossover(parent1, parent2):
     crossover_point = random.randint(1, len(parent1) - 1)
@@ -121,10 +136,10 @@ def create_offspring(selected_for_crossover, individual_shifts, employees):
 
 
 def algorithm(next_generation, individual_shifts, employees, num_selection, population_size):
-    repeat = 0
+    generations = 0
 
     while next_generation[0]['conflicts'] > 0:
-        repeat += 1
+        generations += 1
         for individual in next_generation:
             individual['fitness'], individual['conflicts'] = calculate_fitness(individual['chromosome'], individual_shifts, employees)
         
@@ -143,8 +158,8 @@ def algorithm(next_generation, individual_shifts, employees, num_selection, popu
         # Truncate to the population size
         next_generation = next_generation[:population_size]
 
-    winner = next_generation[0]
-    return winner, repeat
+        winner = next_generation[0]
+    return winner, generations
 
 
 def print_roster(chromosome, individual_shifts, employees):
@@ -162,28 +177,24 @@ def print_roster(chromosome, individual_shifts, employees):
     print(f"Employee Names: {employee_names}, Shift Days: {shift_days}, Fitness: {fitness}, Conflicts: {conflicts}")
 
 
+def assign_shifts(chromosome, individual_shifts, employees):
+    for i, shift in enumerate(individual_shifts):
+        employee_id = chromosome[i]
+        employee = next((emp for emp in employees if emp.id == employee_id), None)
+        shift.employee = employee 
+    return individual_shifts
+
+
 
 def generate_roster(shifts, employees):
     days = DAYS_OF_WEEK
     num_selection = NUM_SELECTED
     population_size = POPULATION_SIZE
-    initial_population_with_fitness = []
 
     individual_shifts, num_shifts = create_individual_shifts(shifts) #Split shifts into individual shift objects 
     initial_population = initialise_population(INITIAL_POPUL_COUNT, employees, num_shifts) #Create random population for these shifts X times, where X = INITIAL_POPUL_COUNT
-    
-    for chromosome in initial_population:
-        fitness, conflicts = calculate_fitness(chromosome, individual_shifts, employees)
+    population_with_fitness = calculate_inital_fitness(initial_population, individual_shifts, employees)
+    chromosome, generations = algorithm(population_with_fitness, individual_shifts, employees, num_selection, population_size)
+    assigned_shifts = assign_shifts(chromosome['chromosome'], individual_shifts, employees)
 
-        # Map employee IDs to first names
-        employee_names = [next((employee.firstname for employee in employees if employee.id == employee_id), None) for employee_id in chromosome]
-        employee_names = [name for name in employee_names if name is not None]
-        print(f"Employee Names: {employee_names}, Fitness: {fitness}, Conflicts: {conflicts}")
-
-        individual_dict = {'chromosome': chromosome, 'fitness': fitness, 'conflicts': conflicts}
-        initial_population_with_fitness.append(individual_dict)
-
-    roster, repeat = algorithm(initial_population_with_fitness, individual_shifts, employees, num_selection, population_size)
-    print("Times repeated", repeat)
-    print_roster(roster['chromosome'], individual_shifts, employees)  # Pass the chromosome from the roster
-    return roster
+    return assigned_shifts, generations, chromosome['conflicts'], chromosome['fitness']
