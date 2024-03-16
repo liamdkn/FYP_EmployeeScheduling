@@ -22,9 +22,19 @@ class Ind_Shift:
         self.end_time = end_time
         self.employee = employee
 
-    def __str__(self):
-        employee_firstname = self.employee.firstname if self.employee else "None"
-        return f"Ind_Shift(id={self.id}, name={self.name}, day={self.day}, start_time={self.start_time}, end_time={self.end_time}, employee={employee_firstname})"
+    def to_dict(self):
+        return {
+            'name': self.name,
+            'day': self.day,
+            'start_time': self.start_time,
+            'end_time': self.end_time,
+            'employee_id': self.employee.id if self.employee else None  # Assuming you want to store the employee ID
+        }
+
+def __str__(self):
+    employee_firstname = self.employee.firstname if self.employee else "None"
+    availability = "Available" if self.employee and self.employee.is_available(self.start_time, self.end_time, self.day) else "Not Available"
+    return f"Ind_Shift(name={self.name}, day={self.day}, start_time={self.start_time}, end_time={self.end_time}, employee={employee_firstname}, availability={availability})"
 
 
 
