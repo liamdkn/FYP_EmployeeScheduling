@@ -6,11 +6,10 @@ from app.routes.employee_routes import employee_blueprint
 from app.routes.shift_routes import shift_blueprint
 from app.routes.roster_routes import roster_blueprint
 
-
 app = Flask(__name__)
 CORS(app)
 
-json_key_path = '/Users/liamdurkan/Repositories/FYP_EmployeeScheduling/python-flask-api/rostergenerator-6bee3-firebase-adminsdk-ptvgm-4dfb90a923.json'
+json_key_path = '/Users/liamdurkan/Repositories/FYP_EmployeeScheduling/python-flask-api/rostergenerator2-firebase-adminsdk-nu4ix-f5e7b904a7.json'
 cred = json.loads(open(json_key_path).read())
 
 # single firestore instance
