@@ -5,6 +5,8 @@ from google.cloud import firestore
 from app.routes.employee_routes import employee_blueprint
 from app.routes.shift_routes import shift_blueprint
 from app.routes.roster_routes import roster_blueprint
+from app.routes.requests_routes import request_blueprint
+
 
 app = Flask(__name__)
 CORS(app)
@@ -19,6 +21,7 @@ app.config['FIRESTORE_CLIENT'] = db
 app.register_blueprint(employee_blueprint)
 app.register_blueprint(shift_blueprint)
 app.register_blueprint(roster_blueprint)
+app.register_blueprint(request_blueprint)
 
 if __name__ == '__main__':
     app.run(port=5000, debug=True)
