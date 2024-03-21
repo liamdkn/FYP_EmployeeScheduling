@@ -42,8 +42,12 @@ def create_roster(shifts_id, employee_ids):
     try:
         employees = get_employees_by_id(employee_ids)
         shifts = get_shifts_by_id(shifts_id)
+
         assigned_shifts, generations, conflicts, fitness = generate_roster(shifts, employees)
-        
+
+        if not shifts or not employees:
+            raise Exception("No shifts or employees available for roster creation")
+
         roster = Roster(roster_id=None, assigned_shifts=assigned_shifts, fitness=fitness, conflicts=conflicts, generations=generations)
 
         print("Generations:", generations)
@@ -62,10 +66,9 @@ def create_roster(shifts_id, employee_ids):
 
         new_roster_ref = generated_rosters_ref.add(roster_data)
         roster_id = new_roster_ref[1].id
-        print(roster_id)
         return roster_id
-    except:
-        pass
+    except Exception as e:
+        print(f"Error creating roster: {e}")
     
 
 

@@ -8,16 +8,23 @@ def get_shifts():
     return shifts
 
 
-def get_shifts_by_id(shift_id):
-    db = current_app.config['FIRESTORE_CLIENT']
-    shift_doc_ref = db.collection('shifts').document(shift_id)
-    shift_doc = shift_doc_ref.get()
+def get_shifts_by_id(shifts_id):
+    print(shifts_id)
+    try:
+        db = current_app.config['FIRESTORE_CLIENT']
+        shift_doc_ref = db.collection('shifts').document(shifts_id)
+        shifts_doc = shift_doc_ref.get()
 
-    if shift_doc.exists:
-        shift_data = shift_doc.to_dict()
-        return shift_data
-    else:
+        if shifts_doc.exists:
+            shifts_data = shifts_doc.to_dict()
+            return shifts_data
+        else:
+            return None
+            print(f"Shifts document not found")
+    except Exception as e:
+        print(f"Error retrieving shift: {e}")
         return None
+
 
 
 def create_shifts(shifts_data):

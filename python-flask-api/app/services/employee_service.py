@@ -20,29 +20,33 @@ def create_employee(employee_data):
         response_data = {
             "status": "Employee created successfully",
             "employee_id": employee_id
-            
         }
-        return response_data, 201
+        return response_data, 201 
 
     except Exception as e:
-        print(f"Error creating employee: {str(e)}")
         return {"error": f"Error creating employee: {str(e)}"}, 500
 
 
 def get_employee(employee_id):
-    print("calling db 2")
-    db = current_app.config['FIRESTORE_CLIENT']
-    employees_ref = db.collection('employees')
-    employee_doc = employees_ref.document(employee_id).get()
+    try:
+        print("calling db 2")
+        db = current_app.config['FIRESTORE_CLIENT']
+        employees_ref = db.collection('employees')
+        employee_doc = employees_ref.document(employee_id).get()
 
-    if employee_doc.exists:
-        employee_data = employee_doc.to_dict()
-        doc_id = employee_doc.id
-        employee = Employee(document_id=None,**employee_data)
-        employee.id = doc_id 
-        return employee
-    else:
-        raise Exception("Employee not found")
+
+        if employee_doc.exists and not employee_doc.to_dict().get('is_deleted', False):
+            employee_data = employee_doc.to_dict()
+            doc_id = employee_doc.id
+            employee = Employee(document_id=None, **employee_data)
+            employee.id = doc_id 
+            return employee
+        else:
+            raise Exception("Employee not found")
+    except Exception as e:
+        print(f"Error retrieving employee: {e}")
+        
+
 
 
 def get_employees():
@@ -50,7 +54,14 @@ def get_employees():
     try:
         db = current_app.config['FIRESTORE_CLIENT']
         employees_ref = db.collection('employees')
-        employees = [employee.to_dict() for employee in employees_ref.stream()]
+        employees = []
+
+        for employee_doc in employees_ref.stream():
+            employee_data = employee_doc.to_dict()
+            employee_id = employee_doc.id
+            employee = Employee(employee_id,**employee_data)
+            employees.append(employee)
+
         return employees
 
     except Exception as e:
@@ -58,19 +69,40 @@ def get_employees():
         return []
 
 
+# Returns a list of employees, provided with a lsit of employees 
 def get_employees_by_id(employee_ids):
-    db = current_app.config['FIRESTORE_CLIENT']
-    employees_ref = db.collection('employees')
-    
-    employees = []
-    for employee_id in employee_ids:
-        employee_doc = employees_ref.document(employee_id).get()
-        if employee_doc.exists:
-            employee_data = employee_doc.to_dict()
-            employee_id = employee_doc.id
-            employee = Employee(employee_id,**employee_data)
-            employees.append(employee)
-    return employees
+    try:
+        db = current_app.config['FIRESTORE_CLIENT']
+        employees_ref = db.collection('employees')
+        
+        employees = []
+        for employee_id in employee_ids:
+            employee_doc = employees_ref.document(employee_id).get()
+
+            if employee_doc.exists and not employee_doc.to_dict().get('is_deleted', False): 
+                employee_data = employee_doc.to_dict()
+                employee = Employee(employee_id, **employee_data)
+                employees.append(employee)
+            else:
+                raise Exception("Employee not found")
+        return employees
+    except Exception as e:
+        print(f"Error retrieving employees: {e}")
+
+
+
+def soft_delete_employee(employee_id):
+    try:
+        db = current_app.config['FIRESTORE_CLIENT']
+        employees_ref = db.collection('employees')
+        employee_ref = employees_ref.document(employee_id)
+        employee_ref.update({'is_deleted': True})
+
+        return {"status": "Employee marked as deleted successfully"}, 200
+    except Exception as e:
+        print(f"Error marking employee as deleted: {e}")
+        return {"error": "Failed to mark employee as deleted"}, 500
+
 
 
 def is_employee_available(employee, shift):
