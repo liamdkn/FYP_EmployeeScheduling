@@ -134,6 +134,17 @@ def create_offspring(selected_for_crossover, individual_shifts, employees):
         offspring.append({'chromosome': child2, 'fitness': child2_fitness, 'conflicts': child2_conflicts})
     return offspring
 
+def mutate_population(population, employees, mutation_rate):
+    print("DEBUG: POPULATION IS MUTATING")
+    mutated_population = []
+    for individual in population:
+        if random.random() < mutation_rate:
+            index_to_mutate = random.randint(0, len(individual['chromosome']) - 1)
+            new_gene_value = random.choice([employee.id for employee in employees])
+            individual['chromosome'][index_to_mutate] = new_gene_value
+        mutated_population.append(individual)
+    return mutated_population
+
 
 def algorithm(next_generation, individual_shifts, employees, num_selection, population_size):
     generations = 0
@@ -151,6 +162,8 @@ def algorithm(next_generation, individual_shifts, employees, num_selection, popu
         next_generation = next_generation + offspring
 
         next_generation = [individual for individual in next_generation if individual['fitness'] is not None]
+
+        next_generation = mutate_population(next_generation, employees, MUTATION_RATE)
         
         # Sort the next generation based on fitness
         next_generation = sorted(next_generation, key=lambda x: x['fitness'], reverse=True)
@@ -159,6 +172,7 @@ def algorithm(next_generation, individual_shifts, employees, num_selection, popu
         next_generation = next_generation[:population_size]
 
         winner = next_generation[0]
+        #print("Generation: ", generations)
     return winner, generations
 
 
@@ -194,7 +208,9 @@ def generate_roster(shifts, employees):
     individual_shifts, num_shifts = create_individual_shifts(shifts) #Split shifts into individual shift objects 
     initial_population = initialise_population(INITIAL_POPUL_COUNT, employees, num_shifts) #Create random population for these shifts X times, where X = INITIAL_POPUL_COUNT
     population_with_fitness = calculate_inital_fitness(initial_population, individual_shifts, employees)
+
     chromosome, generations = algorithm(population_with_fitness, individual_shifts, employees, num_selection, population_size)
+ 
     assigned_shifts = assign_shifts(chromosome['chromosome'], individual_shifts, employees)
 
     return assigned_shifts, generations, chromosome['conflicts'], chromosome['fitness']
