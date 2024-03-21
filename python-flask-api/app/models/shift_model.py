@@ -28,7 +28,7 @@ class Ind_Shift:
             'day': self.day,
             'start_time': self.start_time,
             'end_time': self.end_time,
-            'employee_id': self.employee.id if self.employee else None  # Assuming you want to store the employee ID
+            'employee_id': self.employee.id if self.employee else None  
         }
 
 def __str__(self):
