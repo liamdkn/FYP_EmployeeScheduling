@@ -17,14 +17,14 @@ python-flask-api/app/routes/__pycache__/shift_routes.cpython-39.pyc
 
 venv/
 
-my_app/ios*
+my_app/ios/*
 
-my_app(old)*
+my_app(old)/*
 
 python-flask-api/rostergenerator2-firebase-adminsdk-nu4ix-f5e7b904a7.json
 
-my_app/macos*
+my_app/macos/*
 
-my_app/android*
+my_app/android/*
 my_app/android/app/build.gradle
 my_app/android/gradle/wrapper/gradle-wrapper.properties
