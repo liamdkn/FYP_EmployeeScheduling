@@ -1,57 +1,35 @@
-/*
-* Author: Liam Durkan 
-* Date:
-* Licence: GPL3
-* Brief: This is the main fucntion and the launch page. 
-*/
-
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:my_app/constants.dart';
 import 'package:my_app/firebase_options.dart';
-import 'package:my_app/views/roster_create.dart';
-import 'package:my_app/widgets/navbar.dart';
+import 'package:provider/provider.dart';
+import 'package:my_app/controllers/MenuAppController.dart';
+import 'package:my_app/views/main/main_screen.dart';
 
 Future<void> main() async {
-  WidgetsFlutterBinding
-      .ensureInitialized(); // Ensure that Flutter is initialized
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
-
-  runApp(const MyApp());
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  runApp(MyApp());
 }
 
-class MyApp extends StatefulWidget {
-  const MyApp({super.key});
-
-  @override
-  State<MyApp> createState() => _MyAppState();
-}
-
-class _MyAppState extends State<MyApp> {
-  final firstNameController = TextEditingController();
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-
+class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: Scaffold(
-        drawer: NavBar(),
-        appBar: AppBar(
-          title: Text('Employee Scheduling App'),
-          backgroundColor: Color.fromARGB(255, 74, 62, 207),
-        ),
-        body: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                'Launch Page',
-              ),
-            ],
+      debugShowCheckedModeBanner: false,
+      title: 'Employee Scheduling App',
+      theme: ThemeData.dark().copyWith(
+        scaffoldBackgroundColor: bgColor,
+        canvasColor: secondaryColor,
+        textTheme: Theme.of(context).textTheme.apply(bodyColor: Colors.black),
+      ),
+      home: MultiProvider(
+        providers: [
+          ChangeNotifierProvider(
+            create: (context) => MenuAppController(),
           ),
-        ),
+        ],
+        child: MainScreen(),
       ),
     );
   }
