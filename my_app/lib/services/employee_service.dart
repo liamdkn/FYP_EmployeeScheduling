@@ -5,7 +5,7 @@ class EmployeeService {
   String employeesURI = "http://127.0.0.1:5000/employees";
 
   Future<void> createEmployee(Map<String, dynamic> employeeData) async {
-    print("Got to employee service");
+    print(employeeData);
     final response = await http.post(
       Uri.parse(employeesURI),
       body: jsonEncode(employeeData),
@@ -14,7 +14,7 @@ class EmployeeService {
 
     if (response.statusCode == 201) {
       print(
-          'Employee added successfully with ID: ${jsonDecode(response.body)['id']}');
+          'Employee added successfully with ID: ${jsonDecode(response.body)['employee_id']}');
     } else {
       print('Failed to add employee. Error: ${response.body}');
     }
@@ -31,17 +31,33 @@ class EmployeeService {
       final List<Map<String, dynamic>> employeeList =
           jsonList.map((dynamic json) {
         return {
-          'avalability': json['avalability'],
+          'availability': json['availability'],
           'firstname': json['firstname'],
           'lastname': json['lastname'],
           'email': json['email'],
-          'number': json['number']
+          'number': json['number'],
+          'days_per_week': json['days_per_week']
         };
       }).toList();
       return employeeList;
     } else {
       print('Failed to fetch employees. Error: ${response.body}');
       return [];
+    }
+  }
+
+  Future<void> editEmployee(
+      String employeeId, Map<String, dynamic> employeeData) async {
+    final response = await http.put(
+      Uri.parse('$employeesURI/$employeeId'),
+      body: jsonEncode(employeeData),
+      headers: {'Content-Type': 'application/json'},
+    );
+
+    if (response.statusCode == 200) {
+      print('Employee edited successfully');
+    } else {
+      print('Failed to edit employee. Error: ${response.body}');
     }
   }
 }

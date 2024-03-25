@@ -1,11 +1,11 @@
-//16/03/2024
-
 class Employee {
   final String id;
   final String firstname;
   final String lastname;
   final int daysPerWeek;
-  final List<String> availability;
+  final Map<String, Map<String, String>> availability;
+  final bool isAdmin;
+  final bool isDeleted;
 
   Employee({
     required this.id,
@@ -13,6 +13,8 @@ class Employee {
     required this.lastname,
     required this.daysPerWeek,
     required this.availability,
+    required this.isAdmin,
+    required this.isDeleted,
   });
 
   Map<String, dynamic> toJson() {
@@ -22,34 +24,29 @@ class Employee {
       'lastname': lastname,
       'days_per_week': daysPerWeek,
       'availability': availability,
+      'is_admin': isAdmin,
+      'is_deleted': isDeleted,
     };
   }
 
   factory Employee.fromJson(Map<String, dynamic> json) {
+    Map<String, dynamic> availabilityData = json['availability'];
+    Map<String, Map<String, String>> availability = {};
+    availabilityData.forEach((key, value) {
+      availability[key] = {
+        'start_time': value['start_time'],
+        'end_time': value['end_time'],
+      };
+    });
 
-  Map<String, dynamic> availabilityData = json['availability'];
-  List<String> availability = [];
-  availabilityData.forEach((key, value) {
-    availability.add('$key: ${value['start_time']} - ${value['end_time']}');
-  });
-
-  return Employee(
-    id: json['id'],
-    firstname: json['firstname'],
-    lastname: json['lastname'],
-    daysPerWeek: json['days_per_week'],
-    availability: availability,
-  );
-}
-
-
-  factory Employee.fromMap(Map<String, dynamic> map) {
     return Employee(
-      id: map['id'],
-      firstname: map['firstname'],
-      lastname: map['lastname'],
-      daysPerWeek: map['days_per_week'],
-      availability: List<String>.from(map['availability']),
+      id: json['id'],
+      firstname: json['firstname'],
+      lastname: json['lastname'],
+      daysPerWeek: json['days_per_week'],
+      availability: availability,
+      isAdmin: json['is_admin'],
+      isDeleted: json['is_deleted'],
     );
   }
 }
