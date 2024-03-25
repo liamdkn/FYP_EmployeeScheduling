@@ -1,5 +1,3 @@
-//16/03/2024
-
 import 'package:my_app/models/shift_model.dart';
 
 class Roster {
@@ -18,30 +16,17 @@ class Roster {
   });
 
   factory Roster.fromJson(Map<String, dynamic> json) {
-  List<IndividualShift> assignedShifts = [];
-  
-  try {
-    if (json.containsKey('assigned_shifts') && json['assigned_shifts'] is List) {
-      assignedShifts = List<IndividualShift>.from((json['assigned_shifts'] as List).map((shift) {
-        if (shift is Map<String, dynamic>) {
-          return IndividualShift.fromJson(shift);
-        } else {
-          print('Invalid shift data: $shift');
-        }
-      }));
-    } else {
-      print('No assigned shifts found or assigned shifts is not a list.');
-    }
-  } catch (error) {
-    print('Error parsing shift data in roster from JSON: $error');
+    List<dynamic> shiftsJson = json['assigned_shifts'];
+    List<IndividualShift> shifts = shiftsJson
+        .map((shiftJson) => IndividualShift.fromJson(shiftJson))
+        .toList();
+
+    return Roster(
+      rosterId: json['roster_id'],
+      assignedShifts: shifts,
+      conflicts: json['conflicts'],
+      fitness: json['fitness'],
+      generations: json['generations'],
+    );
   }
-  
-  return Roster(
-    rosterId: json['roster_id'] ?? '',
-    assignedShifts: assignedShifts,
-    conflicts: json['conflicts'] ?? 0,
-    fitness: json['fitness'] ?? 0.0,
-    generations: json['generations'] ?? 0,
-  );
-}
 }
