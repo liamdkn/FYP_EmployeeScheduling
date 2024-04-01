@@ -48,3 +48,32 @@ def get_all_requests():
     except Exception as e:
         return {"error": f"Error retrieving requests: {str(e)}"}
 
+
+
+def approve_request(request_id):
+    try:
+        db = current_app.config['FIRESTORE_CLIENT']
+        request_ref = db.collection('requests').document(request_id)
+
+        request_ref.update({'status': 'Approved'})
+
+        return {"status": "Request approved successfully"}
+
+    except Exception as e:
+        return {"error": f"Error approving request: {str(e)}"}
+
+
+def deny_request(request_id):
+    try:
+        db = current_app.config['FIRESTORE_CLIENT']
+        request_ref = db.collection('requests').document(request_id)
+
+        request_ref.update({'status': 'Denied'})
+
+        return {"status": "Request denied successfully"}
+
+    except Exception as e:
+        return {"error": f"Error denying request: {str(e)}"}
+
+
+

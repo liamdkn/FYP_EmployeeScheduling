@@ -1,6 +1,6 @@
 from flask import Blueprint, jsonify, request
 from flask_cors import CORS
-from app.services.requests_service import create_request, get_all_requests
+from app.services.requests_service import *
 import traceback 
 
 request_blueprint = Blueprint('requests', __name__)
@@ -31,4 +31,23 @@ def get_requests_route():
         return jsonify({'error': 'Internal Server Error'}), 500
 
 
+@request_blueprint.route('/requests/approve/<string:request_id>', methods=['PUT'])
+def approve_request_route(request_id):
+    try:
+        response_data = approve_request(request_id)
+        return jsonify(response_data), 200
+    except Exception as e:
+        print("Error in approve request route")
+        traceback.print_exc()
+        return jsonify({'error': 'Internal Server Error'}), 500
+
+@request_blueprint.route('/requests/deny/<string:request_id>', methods=['PUT'])
+def deny_request_route(request_id):
+    try:
+        response_data = deny_request(request_id)
+        return jsonify(response_data), 200
+    except Exception as e:
+        print("Error in deny request route")
+        traceback.print_exc()
+        return jsonify({'error': 'Internal Server Error'}), 500
 
