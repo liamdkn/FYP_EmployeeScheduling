@@ -34,7 +34,6 @@ class RosterService {
       if (response.statusCode == 200) {
         final List<Map<String, dynamic>> rosterDataList =
             List<Map<String, dynamic>>.from(jsonDecode(response.body));
-        print(response.body);
         final List<Roster> rosters = rosterDataList.map((rosterData) {
           return Roster.fromJson(rosterData);
         }).toList();
@@ -48,6 +47,35 @@ class RosterService {
       print(stackTrace);
       throw Exception(
           'Error fetching rosters: $error\nStack Trace: $stackTrace');
+    }
+  }
+
+  Future<String> createRoster(
+      Roster roster, String shiftId, List<String> employeeIds) async {
+    try {
+      final Map<String, dynamic> requestData = {
+        'roster': roster.toJson(),
+        'shifts_id': shiftId,
+        'employee_ids': employeeIds,
+      };
+
+      final response = await http.post(
+        Uri.parse(rosterURI),
+        body: jsonEncode(requestData),
+        headers: {'Content-Type': 'application/json'},
+      );
+
+      if (response.statusCode == 201) {
+        print('Roster generated successfully');
+        return response.body;
+      } else {
+        throw Exception(
+            'Failed to generate roster. Status Code: ${response.statusCode}');
+      }
+    } catch (error, stackTrace) {
+      print('Error generating roster: $error');
+      print('Stack trace: $stackTrace');
+      throw Exception('Error generating roster: $error');
     }
   }
 }
