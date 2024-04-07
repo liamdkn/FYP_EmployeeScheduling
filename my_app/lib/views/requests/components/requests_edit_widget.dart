@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:my_app/models/employee_request_model.dart';
 import 'package:my_app/services/employee_requests_service.dart';
 import 'package:my_app/constants.dart';
@@ -24,32 +23,34 @@ class EditRequest extends StatelessWidget {
           ),
           const SizedBox(height: defaultPadding),
           Text('Employee ID: ${request.employeeId}'),
+          Divider(),
           Text('Request Type: ${request.requestType}'),
           Text('Reason: ${request.reason}'),
           Divider(),
-          Text('Start Date: ${DateFormat("yyyy-MM-dd").format(request.startDate)}'),
-          Text('End Date: ${DateFormat("yyyy-MM-dd").format(request.endDate)}'),
+          Text('Start Date: ${request.startDate}'),
+          Text('End Date: ${request.endDate}'),
+          Divider(),
           Text('Status: ${request.status}'),
           const SizedBox(height: defaultPadding * 2),
           Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               SizedBox(
-                width: double.infinity, // Expand the button to full width
+                width: double.infinity,
                 child: CustomElevatedButton(
                   onPressed: () {
-                    _approveRequest(request.requestId!); // Pass requestId
+                    _approveRequest(request.requestId!);
                   },
                   text: 'Approve',
                   color: Colors.green,
                 ),
               ),
-              const SizedBox(height: 16), // Add vertical spacing
+              const SizedBox(height: 16)
               SizedBox(
-                width: double.infinity, // Expand the button to full width
+                width: double.infinity,
                 child: CustomElevatedButton(
                   onPressed: () {
-                    _denyRequest(request.requestId!); // Pass requestId
+                    _denyRequest(request.requestId!);
                   },
                   text: 'Deny',
                   color: Colors.red,
@@ -64,19 +65,13 @@ class EditRequest extends StatelessWidget {
 
   void _approveRequest(String requestId) async {
     try {
-      await requestService.approveTimeOffRequest(requestId); // Pass requestId
-      
-    } catch (error) {
-      
-    }
+      await requestService.approveTimeOffRequest(requestId)
+    } catch (error) {}
   }
 
   void _denyRequest(String requestId) async {
     try {
-      await requestService.denyTimeOffRequest(requestId); // Pass requestId
-      
-    } catch (error) {
-      
-    }
+      await requestService.denyTimeOffRequest(requestId); 
+    } catch (error) {}
   }
 }

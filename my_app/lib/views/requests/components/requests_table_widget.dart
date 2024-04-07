@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:my_app/constants.dart';
 import 'package:my_app/models/employee_request_model.dart';
 import 'package:my_app/views/main/components/custom_bottom_screen.dart';
 import 'package:my_app/views/main/components/custom_list_container.dart';
-import 'package:my_app/views/requests/components/requests_edit_widget';
+import 'package:my_app/views/requests/components/requests_edit_widget.dart';
 
 class RequestListTable extends StatelessWidget {
   final List<TimeOffRequest> requests;
@@ -43,10 +42,8 @@ class RequestListTable extends StatelessWidget {
             return DataRow(cells: [
               DataCell(Text(request.employeeId)),
               DataCell(Text(request.requestType)),
-              DataCell(Text(
-                  '${request.startDate.day}-${request.startDate.month}-${request.startDate.year}')),
-              DataCell(Text(
-                  '${request.endDate.day}-${request.endDate.month}-${request.endDate.year}')),
+              DataCell(Text(request.startDate)),
+              DataCell(Text(request.endDate)),
               DataCell(
                 Text(
                   request.status,
@@ -61,7 +58,7 @@ class RequestListTable extends StatelessWidget {
                     onPressed: () {
                       customModalBottomSheet(
                         context: context,
-                        height: 400.0,
+                        height: 450.0,
                         child: EditRequest(request: request),
                       );
                     },

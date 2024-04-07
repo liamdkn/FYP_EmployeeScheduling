@@ -130,10 +130,20 @@ class _TimeOffRequestFormState extends State<TimeOffRequestForm> {
     if (_formKey.currentState!.saveAndValidate()) {
       Map<String, dynamic> formData = _formKey.currentState!.value;
 
+      DateTime startDateTime = formData['startDateTime'];
+      String startDate = DateFormat('dd-MM-yyyy').format(startDateTime);
+      String startTime = DateFormat('HH:mm').format(startDateTime);
+
+      DateTime endDateTime = formData['endDateTime'];
+      String endDate = DateFormat('dd-MM-yyyy').format(endDateTime);
+      String endTime = DateFormat('HH:mm').format(endDateTime);
+
       TimeOffRequest employeeRequest = TimeOffRequest(
-        employeeId: 'frontend',
-        startDate: formData['startDateTime'],
-        endDate: formData['endDateTime'],
+        employeeId: "",
+        startDate: startDate,
+        endDate: endDate,
+        startTime: startTime,
+        endTime: endTime,
         isAllDay: false,
         requestType: formData['requestType'],
         reason: formData['reason'],
