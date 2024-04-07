@@ -30,10 +30,10 @@ def get_employees_route():
         return jsonify({'error': 'Employee not found'}), 500
 
 
-@employee_blueprint.route('/employee/<string:employee_id>', methods=['PUT'])
+@employee_blueprint.route('/employees/<string:employee_id>', methods=['PUT'])
 def delete_employee_route(employee_id):
     response_data, status_code = soft_delete_employee(employee_id)
-    
+    print("hfdjiashfijashdijsahdshdis")
     if status_code == 200:
         return jsonify({'message': response_data['status']}), 200
     elif status_code == 404:
