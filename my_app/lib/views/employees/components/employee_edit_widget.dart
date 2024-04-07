@@ -1,11 +1,9 @@
-//25/01/2024
-
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:my_app/constants.dart';
 import 'package:my_app/models/employee_model.dart';
 import 'package:my_app/views/main/components/custom_elevated_button.dart';
-import 'package:my_app/views/main/components/custom_text_form_field.dart';
+import 'package:my_app/views/main/components/custom_formbuilder_text_field.dart';
 import '../../../services/employee_service.dart';
 
 class EditEmployee extends StatefulWidget {
@@ -20,9 +18,17 @@ class EditEmployee extends StatefulWidget {
 class _EditEmployeeState extends State<EditEmployee> {
   final _formKey = GlobalKey<FormBuilderState>();
 
-  Map<String, Map<String, String>> availability = {};
+  late Employee _editedEmployee;
+  late Map<String, Map<String, String>> _editedAvailability;
 
   final EmployeeService _employeeService = EmployeeService();
+
+  @override
+  void initState() {
+    super.initState();
+    _editedEmployee = widget.employee;
+    _editedAvailability = Map.from(widget.employee.availability);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -39,28 +45,40 @@ class _EditEmployeeState extends State<EditEmployee> {
               const SizedBox(height: defaultPadding),
               _buildEmployeeWeeklyAvailability(),
               const SizedBox(height: defaultPadding),
-              CustomElevatedButton(
-                text: 'Update',
-                onPressed: () async {
-                  if (_formKey.currentState!.saveAndValidate()) {
-                    Map<String, dynamic> formData = {
-                      ..._formKey.currentState!.value,
-                      'availability': availability,
-                    };
-                    print('FormDataeee: $formData');
-                    try {
-                      await _employeeService.editEmployee(
-                          widget.employee.id, formData);
-                      _formKey.currentState?.reset();
-                      setState(() {
-                        availability.clear();
-                      });
-                      Navigator.pop(context);
-                    } catch (error) {
-                      print('Error updating employee: $error');
-                    }
-                  }
-                },
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  CustomElevatedButton(
+                    text: 'Delete',
+                    onPressed: () async {
+                      try {
+                        await _employeeService
+                            .deleteEmployee(_editedEmployee.id!);
+                      } catch (error) {
+                        print('Error deleting employee: $error');
+                      }
+                    },
+                    color: Colors.red,
+                  ),
+                  CustomElevatedButton(
+                    text: 'Save Changes',
+                    onPressed: () async {
+                      if (_formKey.currentState!.saveAndValidate()) {
+                        Map<String, dynamic> updatedData = {
+                          ..._formKey.currentState!.value,
+                          'availability': _editedAvailability,
+                        };
+                        // employee object with edited data
+                        //_editedEmployee = _editedEmployee.copyWith(updatedData);
+                        try {
+                          // await _employeeService.updateEmployee(_editedEmployee);
+                        } catch (error) {
+                          print('Error updating employee: $error');
+                        }
+                      }
+                    },
+                  ),
+                ],
               ),
             ],
           ),
@@ -72,71 +90,58 @@ class _EditEmployeeState extends State<EditEmployee> {
   Widget _buildEditEmployeeForm() {
     return FormBuilder(
       key: _formKey,
-      autovalidateMode: AutovalidateMode.onUserInteraction,
-      skipDisabled: true,
-      initialValue: {
-        'firstname': widget.employee.firstName,
-        'lastname': widget.employee.lastName,
-        'email': widget.employee.email,
-        'number': widget.employee.number,
-        'days_per_week': widget.employee.daysPerWeek.toString(),
-      },
-      child: Column(
+      initialValue: _editedEmployee.toJson()
+        ..['days_per_week'] = _editedEmployee.daysPerWeek.toString(),
+      autovalidateMode: AutovalidateMode.disabled,
+      child: const Column(
         children: [
           Text("Edit Employee"),
           SizedBox(height: defaultPadding),
-          Row(
-            children: [
-              Text("First Name: "),
-              CustomTextFormField(
-                label: "firstname",
-                height: 40.0,
-                width: 180.0,
-                initialValue: widget.employee.firstName,
+          Row(children: [
+            Text("First Name: "),
+            Expanded(
+              child: CustomFormBuilderTextField(
+                name: "firstname",
+                hintText: "Joe",
               ),
-              SizedBox(width: defaultPadding),
-              Text("Surname: "),
-              CustomTextFormField(
-                label: "lastname",
-                height: 40.0,
-                width: 180.0,
-                initialValue: widget.employee.lastName,
+            ),
+            SizedBox(width: defaultPadding),
+            Text("Surname: "),
+            Expanded(
+              child: CustomFormBuilderTextField(
+                name: "lastname",
+                hintText: "Bloggs",
               ),
-            ],
-          ),
+            ),
+          ]),
           SizedBox(height: defaultPadding),
-          Row(
-            children: [
-              Text("Email: "),
-              CustomTextFormField(
-                label: "email",
-                height: 40.0,
-                width: 220.0,
-                initialValue: widget.employee.email,
+          Row(children: [
+            Text("Email: "),
+            Expanded(
+              child: CustomFormBuilderTextField(
+                name: "email",
+                hintText: "email@provider.com",
               ),
-              SizedBox(width: defaultPadding),
-              Text("Phone: "),
-              CustomTextFormField(
-                label: "number",
-                height: 40.0,
-                width: 180.0,
-                initialValue: widget.employee.number,
+            ),
+            SizedBox(width: defaultPadding),
+            Text("Phone: "),
+            Expanded(
+              child: CustomFormBuilderTextField(
+                name: "number",
+                hintText: "0876543210",
               ),
-              SizedBox(width: defaultPadding),
-            ],
-          ),
+            ),
+          ]),
           SizedBox(height: defaultPadding),
-          Row(
-            children: [
-              Text("How many days per week can you work: "),
-              CustomTextFormField(
-                label: "days_per_week",
-                height: 40.0,
-                width: 65.0,
-                initialValue: widget.employee.daysPerWeek.toString(),
+          Row(children: [
+            Text("Days Per Week: "),
+            Expanded(
+              child: CustomFormBuilderTextField(
+                name: "days_per_week",
+                hintText: "5",
               ),
-            ],
-          ),
+            ),
+          ]),
         ],
       ),
     );
@@ -152,15 +157,8 @@ class _EditEmployeeState extends State<EditEmployee> {
   Widget _buildDayAvailabilityColumn(String day) {
     List<String> dropdownOptions = generateHalfHourIntervals();
 
-    Map<String, dynamic>? employeeAvailability = widget.employee.availability;
-    Map<String, String>? dayAvailability;
-
-    if (employeeAvailability != null && employeeAvailability.containsKey(day)) {
-      dayAvailability = Map<String, String>.from(employeeAvailability[day]);
-    }
-
     return Container(
-      width: 450.0,
+      width: 350.0,
       margin: const EdgeInsets.symmetric(vertical: 4.0),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
@@ -186,16 +184,14 @@ class _EditEmployeeState extends State<EditEmployee> {
                 children: [
                   Expanded(
                     child: DropdownButton<String>(
-                      value: dayAvailability != null
-                          ? dayAvailability['start_time']
-                          : null,
+                      value: _editedAvailability[day]?['start_time'],
                       onChanged: (value) {
                         setState(() {
-                          if (employeeAvailability != null) {
-                            employeeAvailability[day]['start_time'] = value!;
-                          }
+                          _editedAvailability[day] ??= {};
+                          _editedAvailability[day]!['start_time'] = value!;
                         });
                       },
+                      dropdownColor: Colors.grey[200],
                       items: dropdownOptions.map((option) {
                         return DropdownMenuItem<String>(
                           value: option,
@@ -207,16 +203,14 @@ class _EditEmployeeState extends State<EditEmployee> {
                   const SizedBox(width: 16.0),
                   Expanded(
                     child: DropdownButton<String>(
-                      value: dayAvailability != null
-                          ? dayAvailability['end_time']
-                          : null,
+                      value: _editedAvailability[day]?['end_time'],
                       onChanged: (value) {
                         setState(() {
-                          if (employeeAvailability != null) {
-                            employeeAvailability[day]['end_time'] = value!;
-                          }
+                          _editedAvailability[day] ??= {};
+                          _editedAvailability[day]!['end_time'] = value!;
                         });
                       },
+                      dropdownColor: Colors.grey[200],
                       items: dropdownOptions.map((option) {
                         return DropdownMenuItem<String>(
                           value: option,
@@ -240,11 +234,11 @@ class _EditEmployeeState extends State<EditEmployee> {
   List<String> generateHalfHourIntervals() {
     List<String> intervals = [];
 
-    for (int hour = 0; hour < 24; hour++) {
+    for (int hour = buisnessOpeningTime; hour < buisnessClosingTime; hour++) {
       for (int minute = 0; minute < 60; minute += 30) {
         String formattedHour = hour.toString().padLeft(2, '0');
         String formattedMinute = minute.toString().padLeft(2, '0');
-        intervals.add('$formattedHour:$formattedMinute:00');
+        intervals.add('$formattedHour:$formattedMinute');
       }
     }
     return intervals;

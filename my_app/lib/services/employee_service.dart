@@ -1,11 +1,12 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:my_app/models/employee_model.dart';
 
 class EmployeeService {
   String employeesURI = "http://127.0.0.1:5000/employees";
 
-  Future<void> createEmployee(Map<String, dynamic> employeeData) async {
-    print(employeeData);
+  Future<void> createEmployee(Employee employee) async {
+    final employeeData = employee.toJson();
     final response = await http.post(
       Uri.parse(employeesURI),
       body: jsonEncode(employeeData),
@@ -20,25 +21,17 @@ class EmployeeService {
     }
   }
 
-  Future<List<Map<String, dynamic>>> getEmployees() async {
+  Future<List<Employee>> getEmployees() async {
     final response = await http.get(Uri.parse(employeesURI));
-
     print('Success Status Code: ${response.statusCode}');
 
     if (response.statusCode == 200) {
       final List<dynamic> jsonList = json.decode(response.body);
 
-      final List<Map<String, dynamic>> employeeList =
-          jsonList.map((dynamic json) {
-        return {
-          'availability': json['availability'],
-          'firstname': json['firstname'],
-          'lastname': json['lastname'],
-          'email': json['email'],
-          'number': json['number'],
-          'days_per_week': json['days_per_week']
-        };
+      final List<Employee> employeeList = jsonList.map((dynamic json) {
+        return Employee.fromJson(json);
       }).toList();
+
       return employeeList;
     } else {
       print('Failed to fetch employees. Error: ${response.body}');
@@ -58,6 +51,19 @@ class EmployeeService {
       print('Employee edited successfully');
     } else {
       print('Failed to edit employee. Error: ${response.body}');
+    }
+  }
+
+  Future<void> deleteEmployee(String employeeId) async {
+    final response = await http.put(
+      Uri.parse('$employeesURI/$employeeId'),
+      headers: {'Content-Type': 'application/json'},
+    );
+
+    if (response.statusCode == 200) {
+      print('Employee deleted successfully');
+    } else {
+      print('Failed to delete employee. Error: ${response.body}');
     }
   }
 }

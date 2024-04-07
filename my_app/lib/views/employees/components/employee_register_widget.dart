@@ -1,10 +1,9 @@
-//24/03/2024
-
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:my_app/constants.dart';
+import 'package:my_app/models/employee_model.dart';
 import 'package:my_app/views/main/components/custom_elevated_button.dart';
-import 'package:my_app/views/main/components/custom_text_form_field.dart';
+import 'package:my_app/views/main/components/custom_formbuilder_text_field.dart';
 import '../../../services/employee_service.dart';
 
 class RegisterEmployee extends StatefulWidget {
@@ -40,12 +39,23 @@ class _RegisterEmployeeState extends State<RegisterEmployee> {
                 text: 'Submit',
                 onPressed: () async {
                   if (_formKey.currentState!.saveAndValidate()) {
-                    Map<String, dynamic> formData = {
-                      ..._formKey.currentState!.value,
-                      'availability': availability,
-                    };
                     try {
-                      await _employeeService.createEmployee(formData);
+                      Employee employee = Employee(
+                        firstName: _formKey.currentState!.value['firstname'],
+                        lastName: _formKey.currentState!.value['lastname'],
+                        daysPerWeek: int.parse(
+                            _formKey.currentState!.value['days_per_week']),
+                        availability: availability.map((key, value) =>
+                            MapEntry(key, value.cast<String, String>())),
+                        isAdmin: false,
+                        isDeleted: false,
+                        email: _formKey.currentState!.value['email'],
+                        number: _formKey.currentState!.value['number'],
+                        id: null,
+                      );
+
+                      await _employeeService.createEmployee(employee);
+
                       _formKey.currentState?.reset();
                       setState(() {
                         availability.clear();
@@ -66,52 +76,55 @@ class _RegisterEmployeeState extends State<RegisterEmployee> {
   Widget _buildCreateEmployeeForm() {
     return FormBuilder(
       key: _formKey,
-      autovalidateMode: AutovalidateMode.onUserInteraction,
-      skipDisabled: true,
+      autovalidateMode: AutovalidateMode.disabled,
       child: const Column(
         children: [
           Text("Create Employee"),
           SizedBox(height: defaultPadding),
           Row(children: [
             Text("First Name: "),
-            CustomTextFormField(
-                placeholder: "Joe",
-                label: "firstname",
-                height: 40.0,
-                width: 180.0),
+            Expanded(
+              child: CustomFormBuilderTextField(
+                name: "firstname",
+                hintText: "Joe",
+              ),
+            ),
             SizedBox(width: defaultPadding),
             Text("Surname: "),
-            CustomTextFormField(
-                placeholder: "Bloggs",
-                label: "lastname",
-                height: 40.0,
-                width: 180.0),
+            Expanded(
+              child: CustomFormBuilderTextField(
+                name: "lastname",
+                hintText: "Bloggs",
+              ),
+            ),
           ]),
           SizedBox(height: defaultPadding),
           Row(children: [
             Text("Email: "),
-            CustomTextFormField(
-                placeholder: "email@provider.com",
-                label: "email",
-                height: 40.0,
-                width: 180.0),
+            Expanded(
+              child: CustomFormBuilderTextField(
+                name: "email",
+                hintText: "email@provider.com",
+              ),
+            ),
             SizedBox(width: defaultPadding),
             Text("Phone: "),
-            CustomTextFormField(
-                placeholder: "0876543210",
-                label: "number",
-                height: 40.0,
-                width: 180.0),
-            SizedBox(width: defaultPadding),
+            Expanded(
+              child: CustomFormBuilderTextField(
+                name: "number",
+                hintText: "0876543210",
+              ),
+            ),
           ]),
           SizedBox(height: defaultPadding),
           Row(children: [
             Text("How many days per week can you work: "),
-            CustomTextFormField(
-                placeholder: "5",
-                label: "days_per_week",
-                height: 40.0,
-                width: 65.0),
+            Expanded(
+              child: CustomFormBuilderTextField(
+                name: "days_per_week",
+                hintText: "5",
+              ),
+            ),
           ]),
         ],
       ),
@@ -162,6 +175,7 @@ class _RegisterEmployeeState extends State<RegisterEmployee> {
                           availability[day]!['start_time'] = value!;
                         });
                       },
+                      dropdownColor: Colors.grey[200],
                       items: dropdownOptions.map((option) {
                         return DropdownMenuItem<String>(
                           value: option,
@@ -180,6 +194,7 @@ class _RegisterEmployeeState extends State<RegisterEmployee> {
                           availability[day]!['end_time'] = value!;
                         });
                       },
+                      dropdownColor: Colors.grey[200],
                       items: dropdownOptions.map((option) {
                         return DropdownMenuItem<String>(
                           value: option,

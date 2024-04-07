@@ -1,62 +1,52 @@
 import 'package:flutter/material.dart';
+import 'package:my_app/models/employee_model.dart';
 import 'package:my_app/views/employees/components/employee_edit_widget.dart';
 import 'package:my_app/views/main/components/custom_bottom_screen.dart';
+import 'package:my_app/views/main/components/custom_list_container.dart';
 import '../../../constants.dart';
 
-class EmployeeList extends StatelessWidget {
-  final List<Map<String, dynamic>> employees;
+class EmployeesDataTable extends StatelessWidget {
+  final List<Employee> employees;
 
-  const EmployeeList({Key? key, required this.employees}) : super(key: key);
+  const EmployeesDataTable({Key? key, required this.employees})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: listBgColor,
-        borderRadius: BorderRadius.circular(10.0),
-      ),
-      child: ListView.builder(
-        shrinkWrap: true,
-        physics: const NeverScrollableScrollPhysics(),
-        itemCount: employees.length,
-        itemBuilder: (context, index) {
-          final employee = employees[index];
-          return Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  '${employee['firstname']} ${employee['lastname']}',
-                  style: const TextStyle(color: primaryTextColour),
-                ),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Email: ${employee['email']}',
-                      style: const TextStyle(color: primaryTextColour),
-                    ),
-                    Text(
-                      'Phone: ${employee['number']}',
-                      style: const TextStyle(color: primaryTextColour),
-                    ),
-                  ],
-                ),
-                IconButton(
-                  icon: const Icon(Icons.edit),
-                  onPressed: () {
-                    customModalBottomSheet(
-                        context: context,
-                        height: 700.0,
-                        child: EditEmployee(employeeData: employee));
-                  },
-                ),
+    return SingleChildScrollView(
+        scrollDirection: Axis.vertical,
+        child: Expanded(
+          child: CustomListContainer(
+            child: DataTable(
+              columns: const [
+                DataColumn(label: Text('Name')),
+                DataColumn(label: Text('Email')),
+                DataColumn(label: Text('Phone Num.')),
+                DataColumn(label: Text('Days Per Week')),
+                DataColumn(label: Text('')),
               ],
+              rows: employees.map((employee) {
+                return DataRow(cells: [
+                  DataCell(Text('${employee.firstName} ${employee.lastName}')),
+                  DataCell(Text(employee.email)),
+                  DataCell(Text(employee.number)),
+                  DataCell(Text(employee.daysPerWeek.toString())),
+                  DataCell(
+                    IconButton(
+                      icon: viewIcon,
+                      onPressed: () {
+                        customModalBottomSheet(
+                          context: context,
+                          height: 750.0,
+                          child: EditEmployee(employee: employee),
+                        );
+                      },
+                    ),
+                  ),
+                ]);
+              }).toList(),
             ),
-          );
-        },
-      ),
-    );
+          ),
+        ));
   }
 }

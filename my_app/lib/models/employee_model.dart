@@ -1,32 +1,46 @@
 class Employee {
-  final String id;
-  final String firstname;
-  final String lastname;
+  final String? id;
+  final String firstName;
+  final String lastName;
   final int daysPerWeek;
   final Map<String, Map<String, String>> availability;
   final bool isAdmin;
   final bool isDeleted;
+  final String email;
+  final String number;
+  final String? employerId;
 
   Employee({
-    required this.id,
-    required this.firstname,
-    required this.lastname,
+    this.id,
+    required this.firstName,
+    required this.lastName,
     required this.daysPerWeek,
     required this.availability,
     required this.isAdmin,
     required this.isDeleted,
+    required this.email,
+    required this.number,
+    this.employerId,
   });
 
   Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'firstname': firstname,
-      'lastname': lastname,
+    Map<String, dynamic> json = {
+      'firstname': firstName,
+      'lastname': lastName,
       'days_per_week': daysPerWeek,
       'availability': availability,
       'is_admin': isAdmin,
       'is_deleted': isDeleted,
+      'email': email,
+      'number': number,
+      'employer_id': employerId,
     };
+
+    if (id != null) {
+      json['id'] = id;
+    }
+
+    return json;
   }
 
   factory Employee.fromJson(Map<String, dynamic> json) {
@@ -41,12 +55,20 @@ class Employee {
 
     return Employee(
       id: json['id'],
-      firstname: json['firstname'],
-      lastname: json['lastname'],
+      firstName: json['firstname'],
+      lastName: json['lastname'],
       daysPerWeek: json['days_per_week'],
       availability: availability,
       isAdmin: json['is_admin'],
       isDeleted: json['is_deleted'],
+      email: json['email'],
+      number: json['number'],
+      employerId: json['employer_id'],
     );
+  }
+
+  @override
+  String toString() {
+    return 'Employee { id: $id, firstName: $firstName, lastName: $lastName, email: $email, number: $number, daysPerWeek: $daysPerWeek, isAdmin: $isAdmin, isDeleted: $isDeleted, availability: $availability, employerId: $employerId }';
   }
 }
