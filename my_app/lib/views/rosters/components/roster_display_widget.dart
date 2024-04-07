@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:my_app/constants.dart';
-import 'package:my_app/models/employee_model.dart';
 import 'package:my_app/models/roster_model.dart';
 import 'package:my_app/models/shift_model.dart';
-import 'package:my_app/services/roster_service.dart';
-import 'package:my_app/views/rosters/components/shift_display_component';
+import 'package:my_app/views/rosters/components/shift_display_component.dart';
 
 class RosterDisplayWidget extends StatelessWidget {
   final Roster roster;
@@ -17,15 +15,55 @@ class RosterDisplayWidget extends StatelessWidget {
       padding: EdgeInsets.all(16.0),
       margin: EdgeInsets.symmetric(vertical: 16.0, horizontal: 16.0),
       decoration: BoxDecoration(
-        border: Border.all(color: Colors.red),
+        color: bgColor,
+        border: Border.all(color: secondaryColor),
+        borderRadius: BorderRadius.circular(15.0),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.5),
+            spreadRadius: 5,
+            blurRadius: 7,
+            offset: Offset(0, 3),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          Table(
+            border: TableBorder.all(color: secondaryColor),
             children: [
-              for (var day in daysOfWeek) _buildDayShiftColumn(roster, day),
+              TableRow(
+                decoration: BoxDecoration(color: listHeaderColor),
+                children: [
+                  for (var day in daysOfWeek)
+                    TableCell(
+                      child: Padding(
+                        padding: EdgeInsets.symmetric(
+                          vertical: 8.0,
+                          horizontal: 4.0,
+                        ),
+                        child: Text(
+                          day,
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                    ),
+                ],
+              ),
+              TableRow(
+                children: [
+                  for (var day in daysOfWeek)
+                    TableCell(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          ..._buildShiftsForDay(roster, day),
+                        ],
+                      ),
+                    ),
+                ],
+              ),
             ],
           ),
         ],
@@ -33,33 +71,16 @@ class RosterDisplayWidget extends StatelessWidget {
     );
   }
 
-  Widget _buildDayShiftColumn(Roster roster, String day) {
+  List<Widget> _buildShiftsForDay(Roster roster, String day) {
     List<IndividualShift> shiftsForDay =
         roster.assignedShifts.where((shift) => shift.day == day).toList();
-    return Expanded(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Container(
-            alignment: Alignment.center,
+    return shiftsForDay
+        .map(
+          (indShift) => Container(
             padding: EdgeInsets.all(8.0),
-            color: Colors.grey[300],
-            child: Text(
-              day,
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
+            child: ShiftDisplayComponent(indShift),
           ),
-          SizedBox(height: 8.0),
-          for (var indShift in shiftsForDay)
-            Container(
-              padding: EdgeInsets.all(8.0),
-              decoration: BoxDecoration(
-                border: Border.all(color: Colors.grey),
-              ),
-              child: ShiftDisplayComponent(indShift),
-            ),
-        ],
-      ),
-    );
+        )
+        .toList();
   }
 }
