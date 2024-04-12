@@ -2,9 +2,12 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:my_app/constants.dart';
+import 'package:my_app/models/business_model.dart';
 import 'package:my_app/models/employee_model.dart';
+import 'package:my_app/services/business_service.dart';
+import 'package:my_app/services/employee_service.dart';
 import 'package:my_app/views/main/components/custom_text_form_field.dart';
-import 'package:my_app/views/user_auth/user_auth_services.dart';
+import 'package:my_app/services/user_auth_services.dart';
 import 'package:my_app/views/user_auth/user_login_page.dart';
 
 class SignUpPage extends StatefulWidget {
@@ -16,6 +19,8 @@ class SignUpPage extends StatefulWidget {
 
 class _SignUpPageState extends State<SignUpPage> {
   final FirebaseAuthService _auth = FirebaseAuthService();
+  final EmployeeService employeeService = EmployeeService();
+  final BusinessService businessService = BusinessService();
 
   TextEditingController _firstNameController = TextEditingController();
   TextEditingController _lastNameController = TextEditingController();
@@ -48,13 +53,13 @@ class _SignUpPageState extends State<SignUpPage> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text(
+              const Text(
                 "Register",
                 style: TextStyle(fontSize: 27, fontWeight: FontWeight.bold),
               ),
-              SizedBox(height: defaultPadding),
+              const SizedBox(height: defaultPadding),
               Container(
-                padding: EdgeInsets.all(defaultPadding),
+                padding: const EdgeInsets.all(defaultPadding),
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(20),
@@ -63,54 +68,54 @@ class _SignUpPageState extends State<SignUpPage> {
                       color: Colors.grey.withOpacity(0.5),
                       spreadRadius: 5,
                       blurRadius: 7,
-                      offset: Offset(0, 3),
+                      offset: const Offset(0, 3),
                     ),
                   ],
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    SizedBox(height: defaultPadding),
+                    const SizedBox(height: defaultPadding),
                     CustomTextFormField(
                       label: "First Name",
                       placeholder: "First Name",
                       controller: _firstNameController,
                     ),
-                    SizedBox(height: defaultPadding),
+                    const SizedBox(height: defaultPadding),
                     CustomTextFormField(
                       label: "Last Name",
                       placeholder: "Last Name",
                       controller: _lastNameController,
                     ),
-                    SizedBox(height: defaultPadding),
+                    const SizedBox(height: defaultPadding),
                     CustomTextFormField(
                       label: "Email",
                       placeholder: "Email",
                       controller: _emailController,
                     ),
-                    SizedBox(height: defaultPadding),
+                    const SizedBox(height: defaultPadding),
                     CustomTextFormField(
                       label: "Password",
                       controller: _passwordController,
                       placeholder: "Password",
                     ),
-                    SizedBox(height: defaultPadding),
+                    const SizedBox(height: defaultPadding),
                     CustomTextFormField(
                       label: "Phone Number",
                       controller: _phoneNumberController,
                       placeholder: "Phone Number",
                     ),
-                    SizedBox(height: defaultPadding),
+                    const SizedBox(height: defaultPadding),
                     CustomTextFormField(
                       label: "Access Code", // Add access code field
                       controller: _accessCodeController,
                       placeholder: "Access Code",
                     ),
-                    SizedBox(height: defaultPadding),
+                    const SizedBox(height: defaultPadding),
                     Row(
                       children: [
-                        Text("Are you a: "),
-                        SizedBox(width: defaultPadding),
+                        const Text("Are you a: "),
+                        const SizedBox(width: defaultPadding),
                         DropdownButton<String>(
                           value: userType,
                           onChanged: (value) {
@@ -119,11 +124,11 @@ class _SignUpPageState extends State<SignUpPage> {
                             });
                           },
                           items: [
-                            DropdownMenuItem(
-                              child: Text("Employer"),
-                              value: "employer",
+                            const DropdownMenuItem(
+                              child: Text("New Employer"),
+                              value: "business",
                             ),
-                            DropdownMenuItem(
+                            const DropdownMenuItem(
                               child: Text("Employee"),
                               value: "employee",
                             ),
@@ -134,7 +139,7 @@ class _SignUpPageState extends State<SignUpPage> {
                   ],
                 ),
               ),
-              SizedBox(height: defaultPadding),
+              const SizedBox(height: defaultPadding),
               GestureDetector(
                 onTap: _signUp,
                 child: Container(
@@ -146,10 +151,10 @@ class _SignUpPageState extends State<SignUpPage> {
                   ),
                   child: Center(
                     child: isSigningUp
-                        ? CircularProgressIndicator(
+                        ? const CircularProgressIndicator(
                             color: Colors.white,
                           )
-                        : Text(
+                        : const Text(
                             "Sign Up",
                             style: TextStyle(
                               color: Colors.white,
@@ -159,12 +164,12 @@ class _SignUpPageState extends State<SignUpPage> {
                   ),
                 ),
               ),
-              SizedBox(height: defaultPadding),
+              const SizedBox(height: defaultPadding),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text("Already have an account?"),
-                  SizedBox(width: 5),
+                  const Text("Already have an account?"),
+                  const SizedBox(width: 5),
                   GestureDetector(
                     onTap: () {
                       Navigator.pushAndRemoveUntil(
@@ -175,7 +180,7 @@ class _SignUpPageState extends State<SignUpPage> {
                         (route) => false,
                       );
                     },
-                    child: Text(
+                    child: const Text(
                       "Login",
                       style: TextStyle(
                         color: Colors.blue,
@@ -212,11 +217,10 @@ class _SignUpPageState extends State<SignUpPage> {
         print('User ID: $userId');
 
         if (userType == "employee") {
-          // Fetch employer ID using access code
-          String? employerId = await fetchEmployerId(accessCode);
+          String buisnessId = buisnessID;
 
-          // Create employee object
           Employee employee = Employee(
+            id: userId,
             firstName: firstName,
             lastName: lastName,
             email: email,
@@ -225,16 +229,53 @@ class _SignUpPageState extends State<SignUpPage> {
             availability: {},
             isAdmin: false,
             isDeleted: false,
-            employerId: employerId,
+            businessId: buisnessId,
           );
-        } else if (userType == "employer") {
-          // mployer sign-up
+
+          employeeService.createEmployee(employee);
+        } else if (userType == "business") {
+          Business business = Business(
+            name: firstName,
+            number: phoneNumber,
+            email: email,
+            openingHours: {},
+            isDeleted: false,
+          );
+
+          String businessId = await businessService.createBusiness(business);
+
+          // admin employee tied to the business
+          Employee adminEmployee = Employee(
+            id: userId,
+            firstName: firstName,
+            lastName: lastName,
+            email: email,
+            number: phoneNumber,
+            daysPerWeek: 0,
+            availability: {},
+            isAdmin: true,
+            isDeleted: false,
+            businessId: businessId,
+          );
+
+          employeeService.createEmployee(adminEmployee);
         } else {
           //  no user type selected
         }
       } else {
         print('Error: User is null after signing up');
       }
+
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(
+          builder: (context) => LoginPage(
+            email: email,
+            password: password,
+          ),
+        ),
+        (route) => false,
+      );
 
       setState(() {
         isSigningUp = false;
@@ -245,9 +286,5 @@ class _SignUpPageState extends State<SignUpPage> {
         isSigningUp = false;
       });
     }
-  }
-
-  fetchEmployerId(String accessCode) {
-    return "123";
   }
 }
