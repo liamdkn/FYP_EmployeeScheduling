@@ -45,7 +45,7 @@ class EditRequest extends StatelessWidget {
                   color: Colors.green,
                 ),
               ),
-              const SizedBox(height: 16)
+              const SizedBox(height: 16),
               SizedBox(
                 width: double.infinity,
                 child: CustomElevatedButton(
@@ -65,13 +65,13 @@ class EditRequest extends StatelessWidget {
 
   void _approveRequest(String requestId) async {
     try {
-      await requestService.approveTimeOffRequest(requestId)
+      await requestService.approveTimeOffRequest(requestId);
     } catch (error) {}
   }
 
   void _denyRequest(String requestId) async {
     try {
-      await requestService.denyTimeOffRequest(requestId); 
+      await requestService.denyTimeOffRequest(requestId);
     } catch (error) {}
   }
 }

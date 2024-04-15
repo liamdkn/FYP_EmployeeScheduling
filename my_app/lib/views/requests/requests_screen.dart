@@ -3,7 +3,7 @@ import 'package:my_app/constants.dart';
 import 'package:my_app/models/employee_request_model.dart';
 import 'package:my_app/services/employee_requests_service.dart';
 import 'package:my_app/views/main/components/custom_bottom_screen.dart';
-import 'package:my_app/views/main/components/custon_info_clicker.dart';
+import 'package:my_app/views/main/components/custom_info_clicker.dart';
 import 'package:my_app/views/main/components/header_widget.dart';
 import 'package:my_app/views/requests/components/requests_create_form.dart';
 import 'package:my_app/views/requests/components/requests_table_widget.dart';
