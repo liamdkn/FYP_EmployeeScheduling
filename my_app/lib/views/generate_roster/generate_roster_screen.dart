@@ -1,6 +1,5 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:my_app/models/roster_model.dart';
 import 'package:my_app/models/shift_model.dart';
 import 'package:my_app/responsive.dart';
@@ -16,7 +15,7 @@ import 'package:my_app/views/main/components/custom_elevated_button.dart';
 import '../../../constants.dart';
 
 class GenerateRosterScreen extends StatefulWidget {
-  const GenerateRosterScreen({Key? key}) : super(key: key);
+  const GenerateRosterScreen({super.key});
 
   @override
   _GenerateRosterState createState() => _GenerateRosterState();
@@ -31,12 +30,13 @@ class _GenerateRosterState extends State<GenerateRosterScreen> {
 
   final TextEditingController _rosterNameController = TextEditingController();
   late String selectedWeekNumber = 'Week 1';
-  late DateTime startDate;
 
-  @override
-  void initState() {
-    super.initState();
-    startDate = DateTime.now();
+  late DateTime startDate = DateTime.now();
+
+  void onStartDateSelected(DateTime date) {
+    setState(() {
+      startDate = date;
+    });
   }
 
   @override
@@ -71,7 +71,10 @@ class _GenerateRosterState extends State<GenerateRosterScreen> {
                         Row(
                           children: [
                             Expanded(
-                              child: RosterDetailsForm(_rosterNameController),
+                              child: RosterDetailsForm(
+                                _rosterNameController,
+                                onStartDateSelected: onStartDateSelected,
+                              ),
                             ),
                           ],
                         ),
@@ -139,6 +142,7 @@ class _GenerateRosterState extends State<GenerateRosterScreen> {
   }
 
   void _createRoster(String rosterName, DateTime startDate) async {
+    String formattedStartDate = DateFormat('dd-MM-yyyy').format(startDate);
     try {
       String shiftsId = await shiftService.createShifts(shifts);
       Roster roster = Roster(
@@ -148,20 +152,19 @@ class _GenerateRosterState extends State<GenerateRosterScreen> {
         conflicts: null,
         fitness: -1,
         generations: null,
-        startDate: startDate,
+        startDate: formattedStartDate,
         isCurrentRoster: false,
         isPublished: false,
         dateCreated: DateTime.now(),
-        weekNumber: null,
         isDeleted: false,
       );
-      final response =
+      final generatedRoster =
           await rosterService.createRoster(roster, shiftsId, employeeIds);
 
-      Navigator.pushReplacement(
+      Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => GeneratedRosterScreen(response),
+          builder: (context) => GeneratedRosterScreen(generatedRoster),
         ),
       );
     } catch (error) {

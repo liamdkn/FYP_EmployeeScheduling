@@ -1,13 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:my_app/models/roster_model.dart';
 import 'package:my_app/responsive.dart';
-import 'package:my_app/views/main/components/custom_elevated_button.dart';
 import 'package:my_app/views/main/components/header_widget.dart';
-import 'package:my_app/views/roster_create.dart';
 import 'package:my_app/views/rosters/components/roster_display_widget.dart';
-import 'package:my_app/views/rosters/components/rosters_table_widget.dart';
-import 'package:my_app/views/rosters/components/roster_picker.dart';
-import 'package:my_app/widgets/shift_week_tabs.dart';
+import 'package:my_app/views/rosters/components/roster_data_table.dart';
 import '../../../constants.dart';
 import 'package:my_app/services/roster_service.dart';
 
@@ -24,8 +20,7 @@ class _RosterScreenState extends State<RosterScreen> {
   @override
   void initState() {
     super.initState();
-    // Initialize selectedRoster as null initially
-    fetchRosters(); // Fetch rosters and initialize selectedRoster in initState
+    fetchRosters();
     selectedRoster = null;
   }
 
@@ -53,7 +48,7 @@ class _RosterScreenState extends State<RosterScreen> {
             ),
             const SizedBox(height: defaultPadding),
             if (rosters.isEmpty)
-              Center(
+              const Center(
                 child: CircularProgressIndicator(),
               )
             else
@@ -70,7 +65,8 @@ class _RosterScreenState extends State<RosterScreen> {
                         ),
                         const SizedBox(height: defaultPadding),
                         Container(
-                          child: RosterTable(
+                          width: double.infinity,
+                          child: RostersDataTable(
                             rosters: rosters,
                             onRosterSelected: (roster) {
                               handleRosterSelected(roster);
@@ -88,23 +84,6 @@ class _RosterScreenState extends State<RosterScreen> {
                   ),
                   if (!Responsive.isMobile(context))
                     const SizedBox(width: defaultPadding),
-                  if (!Responsive.isMobile(context))
-                    Expanded(
-                      flex: 1,
-                      child: Container(
-                        child: CustomElevatedButton(
-                          text: 'Generate Roster',
-                          height: 45,
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => const CreateRoster()),
-                            );
-                          },
-                        ),
-                      ),
-                    ),
                 ],
               ),
           ],
@@ -113,7 +92,7 @@ class _RosterScreenState extends State<RosterScreen> {
     );
   }
 
-  // Define the callback function to handle roster selection
+  // Callback function passing roster id
   void handleRosterSelected(Roster roster) {
     print('Selected Roster: ${roster.rosterId}');
     setState(() {

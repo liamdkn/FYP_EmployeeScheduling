@@ -1,3 +1,4 @@
+import 'package:intl/intl.dart';
 import 'package:my_app/models/shift_model.dart';
 
 class Roster {
@@ -7,10 +8,10 @@ class Roster {
   final int? conflicts;
   final double fitness;
   final int? generations;
-  final DateTime? startDate;
+  final String startDate;
   final DateTime? endDate;
   final bool? isCurrentRoster;
-  final bool? isPublished;
+  final bool isPublished;
   final DateTime? dateCreated;
   final int? weekNumber;
   final bool isDeleted;
@@ -22,16 +23,17 @@ class Roster {
     this.conflicts,
     required this.fitness,
     this.generations,
-    this.startDate,
+    required this.startDate,
     this.endDate,
     this.isCurrentRoster,
-    this.isPublished,
+    required this.isPublished,
     this.dateCreated,
     this.weekNumber,
     required this.isDeleted,
   });
 
   Map<String, dynamic> toJson() {
+    ;
     return {
       'roster_id': rosterId,
       'roster_name': rosterName,
@@ -39,7 +41,7 @@ class Roster {
       'conflicts': conflicts,
       'fitness': fitness,
       'generations': generations,
-      'start_date': startDate?.toIso8601String(),
+      'start_date': startDate,
       'end_date': endDate?.toIso8601String(),
       'is_current_roster': isCurrentRoster,
       'is_published': isPublished,
@@ -63,13 +65,11 @@ class Roster {
       conflicts: json['conflicts'] ?? 0,
       fitness: json['fitness'] ?? 0.0,
       generations: json['generations'] ?? 0,
-      startDate: json['start_date'] != null
-          ? DateTime.parse(json['start_date'])
-          : null,
+      startDate: json['start_date'],
       endDate:
           json['end_date'] != null ? DateTime.parse(json['end_date']) : null,
       isCurrentRoster: json['is_current_roster'] as bool? ?? false,
-      isPublished: json['is_published'] as bool? ?? false,
+      isPublished: json['is_published'],
       dateCreated: json['date_created'] != null
           ? DateTime.parse(json['date_created'])
           : null,

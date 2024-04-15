@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:my_app/constants.dart';
 import 'package:my_app/views/main/components/custom_elevated_button.dart';
 import 'package:my_app/views/main/components/custom_formbuilder_text_field.dart';
@@ -223,18 +224,25 @@ class _ShiftInputWidgetState extends State<ShiftInputWidget> {
     int daysToSubtract = selectedDate.weekday - 1;
     DateTime startDate = selectedDate.subtract(Duration(days: daysToSubtract));
 
+    List<int> selectedWeekDays = [];
     for (int i = 0; i < daysOfWeek.length; i++) {
       if (selectedDays[i]) {
-        IndividualShift individualShift = IndividualShift(
-          name: shiftName,
-          day: daysOfWeek[i],
-          startTime: startTime,
-          endTime: endTime,
-          employee: null,
-          date: startDate.add(Duration(days: i)),
-        );
-        widget.onAddIndividualShift(individualShift);
+        selectedWeekDays.add(i);
       }
+    }
+    //create shifts
+    for (int dayIndex in selectedWeekDays) {
+      DateTime shiftDate = startDate.add(Duration(days: dayIndex));
+      String formattedDate = DateFormat('dd-MM-yyyy').format(shiftDate);
+      IndividualShift individualShift = IndividualShift(
+        name: shiftName,
+        day: daysOfWeek[dayIndex],
+        startTime: startTime,
+        endTime: endTime,
+        employee: null,
+        date: formattedDate,
+      );
+      widget.onAddIndividualShift(individualShift);
     }
 
     setState(() {

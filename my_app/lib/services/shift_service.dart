@@ -1,16 +1,14 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'package:my_app/models/shift.dart';
+import 'package:my_app/models/shift_model.dart';
 
 class ShiftService {
   static const String shiftsURI = "http://127.0.0.1:5000/shifts";
-  Future<void> createShiftsList(List<Shift> shiftData) async {
-    try {
-      final List<Map<String, dynamic>> shiftsJsonList =
-          shiftData.map((shift) => shift.toJson()).toList();
 
-      // Print the JSON data for inspection
-      print('JSON Data: ${jsonEncode(shiftsJsonList)}');
+  Future<String> createShifts(List<IndividualShift> shifts) async {
+    try {
+      List<Map<String, dynamic>> shiftsJsonList =
+          shifts.map((shift) => shift.toJson()).toList();
 
       final response = await http.post(
         Uri.parse(shiftsURI),
@@ -19,13 +17,17 @@ class ShiftService {
       );
 
       if (response.statusCode == 201) {
-        print(
-            'Shifts added successfully. Response: ${jsonDecode(response.body)}');
+        final responseData = jsonDecode(response.body);
+        final String shiftIds = responseData['shifts_id'];
+        print('Shifts added successfully. IDs: $shiftIds');
+        return shiftIds;
       } else {
         print('Failed to add shifts. Error: ${response.body}');
+        return "";
       }
     } catch (error) {
       print('Error creating shifts: $error');
+      throw error;
     }
   }
 }

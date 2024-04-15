@@ -6,8 +6,10 @@ import 'package:my_app/views/main/components/custom_formbuilder_text_field.dart'
 
 class RosterDetailsForm extends StatefulWidget {
   final TextEditingController _rosterNameController;
+  final Function(DateTime) onStartDateSelected;
 
-  RosterDetailsForm(this._rosterNameController);
+  RosterDetailsForm(this._rosterNameController,
+      {required this.onStartDateSelected});
 
   @override
   _RosterDetailsFormState createState() => _RosterDetailsFormState();
@@ -73,6 +75,7 @@ class _RosterDetailsFormState extends State<RosterDetailsForm> {
       setState(() {
         _selectedDate = pickedDate;
       });
+      widget.onStartDateSelected(pickedDate);
     }
   }
 
