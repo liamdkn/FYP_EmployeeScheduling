@@ -2,11 +2,18 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:my_app/views/user_auth/componenets/form_container_widget.dart';
-import 'package:my_app/views/user_auth/user_auth_services.dart';
+import 'package:my_app/services/user_auth_services.dart';
+import 'package:my_app/views/user_auth/user_auth_provider.dart';
 import 'package:my_app/views/user_auth/user_signup_page.dart';
+import 'package:provider/provider.dart';
 
 class LoginPage extends StatefulWidget {
-  const LoginPage({super.key, String? nextRoute});
+  final String? email;
+  final String? password;
+  String? nextRoute;
+
+  LoginPage({Key? key, this.email, this.password, this.nextRoute})
+      : super(key: key);
 
   @override
   State<LoginPage> createState() => _LoginPageState();
@@ -19,6 +26,13 @@ class _LoginPageState extends State<LoginPage> {
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
   TextEditingController _emailController = TextEditingController();
   TextEditingController _passwordController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    _emailController.text = widget.email ?? '';
+    _passwordController.text = widget.password ?? '';
+  }
 
   @override
   void dispose() {
@@ -132,17 +146,31 @@ class _LoginPageState extends State<LoginPage> {
     String email = _emailController.text;
     String password = _passwordController.text;
 
-    User? user = await _auth.signInWithEmailAndPassword(email, password);
+    try {
+      UserCredential userCredential =
+          await _firebaseAuth.signInWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
 
-    setState(() {
-      _isSigning = false;
-    });
+      User? user = userCredential.user;
 
-    if (user != null) {
-      print("User is successfully signed in");
-      Navigator.pushNamed(context, "/home");
-    } else {
-      print("some error occured");
+      setState(() {
+        _isSigning = false;
+      });
+
+      if (user != null) {
+        context.read<AuthUserProvider>().setUser(user);
+        print("User is successfully signed in");
+        Navigator.pushNamed(context, "/home");
+      } else {
+        print("Some error occurred during sign-in");
+      }
+    } catch (e) {
+      print("Error signing in: $e");
+      setState(() {
+        _isSigning = false;
+      });
     }
   }
 }
