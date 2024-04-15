@@ -1,6 +1,6 @@
 from flask import Blueprint, jsonify, request
 from flask_cors import CORS
-from app.services.employee_service import get_employee, get_employees, create_employee, soft_delete_employee
+from app.services.employee_service import get_employee, get_employees, create_employee, soft_delete_employee, edit_employee
 
 employee_blueprint = Blueprint('employee', __name__)
 CORS(employee_blueprint)
@@ -11,7 +11,7 @@ def create_employee_route():
     response_data, status_code = create_employee(employee_data)
     return jsonify(response_data), status_code
 
-@employee_blueprint.route('/employee/<string:employee_id>', methods=['GET'])
+@employee_blueprint.route('/employees/<string:employee_id>', methods=['GET'])
 def get_employee_route(employee_id):
     try:
         employee = get_employee(employee_id)
@@ -33,7 +33,6 @@ def get_employees_route():
 @employee_blueprint.route('/employees/<string:employee_id>', methods=['PUT'])
 def delete_employee_route(employee_id):
     response_data, status_code = soft_delete_employee(employee_id)
-    print("hfdjiashfijashdijsahdshdis")
     if status_code == 200:
         return jsonify({'message': response_data['status']}), 200
     elif status_code == 404:
@@ -42,6 +41,15 @@ def delete_employee_route(employee_id):
         return jsonify({'error': response_data['error']}), 500
 
 
+@employee_blueprint.route('/employees/<string:employee_id>', methods=['PUT'])
+def edit_employee_route(employee_id):
+    try:
+        print("trying")
+        employee_data = request.json
+        response_data, status_code = edit_employee(employee_id, employee_data)
+        return jsonify(response_data), status_code
+    except Exception as e:
+        return jsonify({'error': f'Error editing employee: {str(e)}'}), 500
 
 
 

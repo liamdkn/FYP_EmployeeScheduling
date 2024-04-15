@@ -31,8 +31,7 @@ class Ind_Shift:
             'date': self.date,
             'start_time': self.start_time,
             'end_time': self.end_time,
-            'employee': self.employee.to_dict() if self.employee else None,
-        }
+            'employee': self.employee.to_dict() if hasattr(self.employee, 'to_dict') else self.employee,        }
 
     def __str__(self):
         employee_firstname = self.employee.firstname if self.employee else "None"

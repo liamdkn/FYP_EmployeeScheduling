@@ -1,7 +1,7 @@
 from app.models.shift_model import Ind_Shift
 class Roster:
     def __init__(self, roster_id, assigned_shifts, fitness, conflicts, generations,
-                roster_name=None, start_date=None, end_date=None, is_current_roster=False,
+                roster_name, start_date=None, end_date=None, is_current_roster=False,
                 is_published=False, date_created=None, week_number=None, is_deleted=False):
         self.roster_id = roster_id
         self.roster_name = roster_name

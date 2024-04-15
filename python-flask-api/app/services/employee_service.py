@@ -1,21 +1,18 @@
+import traceback
 from flask import current_app
 from app.models.employee_model import Employee
 from datetime import time
 
 def create_employee(employee_data):
     try:
-        print("calling db 1")
+        print('DEBUG: Create employee service')
         db = current_app.config['FIRESTORE_CLIENT']
         employees_ref = db.collection('employees')  
 
-        new_employee = Employee(document_id=None, **employee_data)
+        employee_id = employee_data.get('id', None)
+        new_employee = Employee(**employee_data)
         employee_dict = new_employee.to_dict()
-        employee_dict.pop('id', None)
-
-        new_employee_ref = employees_ref.add(employee_dict) 
-
-        employee_id = new_employee_ref[1].id
-        employee_dict['id'] = employee_id
+        employees_ref.document(employee_id).set(employee_dict)
 
         response_data = {
             "status": "Employee created successfully",
@@ -38,7 +35,7 @@ def get_employee(employee_id):
         if employee_doc.exists and not employee_doc.to_dict().get('is_deleted', False):
             employee_data = employee_doc.to_dict()
             doc_id = employee_doc.id
-            employee = Employee(document_id=None, **employee_data)
+            employee = Employee(**employee_data)
             employee.id = doc_id 
             return employee
         else:
@@ -46,8 +43,6 @@ def get_employee(employee_id):
     except Exception as e:
         print(f"Error retrieving employee: {e}")
         
-
-
 
 def get_employees():
     print("calling db 3")
@@ -58,8 +53,8 @@ def get_employees():
 
         for employee_doc in employees_ref.stream():
             employee_data = employee_doc.to_dict()
-            employee_id = employee_doc.id
-            employee = Employee(employee_id,**employee_data)
+        #employee_id = employee_doc.id
+            employee = Employee(**employee_data)
             employees.append(employee)
 
         return employees
@@ -69,7 +64,8 @@ def get_employees():
         return []
 
 
-# Returns a list of employees, provided with a lsit of employees 
+import traceback
+
 def get_employees_by_id(employee_ids):
     try:
         db = current_app.config['FIRESTORE_CLIENT']
@@ -81,13 +77,15 @@ def get_employees_by_id(employee_ids):
 
             if employee_doc.exists and not employee_doc.to_dict().get('is_deleted', False): 
                 employee_data = employee_doc.to_dict()
-                employee = Employee(employee_id, **employee_data)
+                print(employee_data)
+                employee = Employee(**employee_data)
                 employees.append(employee)
-            else:
-                raise Exception("Employee not found")
+
         return employees
     except Exception as e:
         print(f"Error retrieving employees: {e}")
+        traceback.print_exc()
+
 
 
 
@@ -125,4 +123,39 @@ def is_employee_available(employee, shift):
     else:
         return False
 
+def edit_employee(employee_id, employee_data):
+    try:
+        print("editing employee")
+        db = current_app.config['FIRESTORE_CLIENT']
+        employees_ref = db.collection('employees')  
+
+        employee_doc = employees_ref.document(employee_id).get()
+        if not employee_doc.exists:
+            return {"error": "Employee not found"}, 404
+
+        employee_data.pop('id', None)
+        employees_ref.document(employee_id).update(employee_data)
+
+        response_data = {
+            "status": "Employee updated successfully",
+            "employee_id": employee_id
+        }
+        return response_data, 200 
+
+    except Exception as e:
+        return {"error": f"Error editing employee: {str(e)}"}, 500
+
+
+def is_user_employee(user_id):
+    try:
+        db = current_app.config['FIRESTORE_CLIENT']
+        employees_ref = db.collection('employees')
+        employee_doc = employees_ref.document(user_id).get()
+        if employee_doc.exists and not employee_doc.to_dict().get('is_deleted', False):
+            return True
+        else: False
+    except Exception as e:
+        print(f"Error checking employee: {e}")
+        traceback.print_exc()
+        return False
 
