@@ -7,7 +7,7 @@ user_blueprint = Blueprint('user', __name__)
 CORS(user_blueprint)
 
 @user_blueprint.route('/user/<string:user_id>', methods=['GET'])
-def get_user(user_id):
+def get_user_type(user_id):
     try:
         user_type = None
         if is_user_employee(user_id):

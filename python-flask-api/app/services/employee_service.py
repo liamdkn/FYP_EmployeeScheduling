@@ -2,6 +2,8 @@ import traceback
 from flask import current_app
 from app.models.employee_model import Employee
 from datetime import time
+from datetime import datetime
+import traceback
 
 def create_employee(employee_data):
     try:
@@ -31,17 +33,18 @@ def get_employee(employee_id):
         employees_ref = db.collection('employees')
         employee_doc = employees_ref.document(employee_id).get()
 
-
         if employee_doc.exists and not employee_doc.to_dict().get('is_deleted', False):
             employee_data = employee_doc.to_dict()
             doc_id = employee_doc.id
             employee = Employee(**employee_data)
             employee.id = doc_id 
+            print(employee.id)
             return employee
         else:
             raise Exception("Employee not found")
     except Exception as e:
         print(f"Error retrieving employee: {e}")
+        traceback.print_exc()
         
 
 def get_employees():
@@ -103,25 +106,50 @@ def soft_delete_employee(employee_id):
 
 
 
-def is_employee_available(employee, shift):
-    availability = employee.availability
+from datetime import datetime, time
 
-    shift_start_time = shift.start_time
-    shift_end_time = shift.end_time
-    day = shift.day
+def is_employee_available(employee, shift, approved_requests):
+    try:
+        availability = employee.availability
+        shift_start_time = datetime.strptime(shift.start_time, "%H:%M").time()
+        shift_end_time = datetime.strptime(shift.end_time, "%H:%M").time()
+        shift_date = datetime.strptime(shift.date, "%d-%m-%Y").date()
+        shift_day = shift.day
 
-    if day in availability:
-        employee_availability = availability[day]
-        employee_start_time = employee_availability['start_time']
-        employee_end_time = employee_availability['end_time']
+        # does shift overlaps with requests
+        for request in approved_requests:
+            request_start_date = datetime.strptime(request.start_date, "%d-%m-%Y").date()
+            request_end_date = datetime.strptime(request.end_date, "%d-%m-%Y").date()
+            request_start_time = datetime.strptime(request.start_time, "%H:%M").time()
+            request_end_time = datetime.strptime(request.end_time, "%H:%M").time()
 
-        if (
-            employee_start_time <= shift_start_time <= employee_end_time
-            and employee_start_time <= shift_end_time <= employee_end_time
-        ):
-            return True
-    else:
+            request_start_datetime = datetime.combine(request_start_date, request_start_time)
+            request_end_datetime = datetime.combine(request_end_date, request_end_time)
+            shift_start_datetime = datetime.combine(shift_date, shift_start_time)
+            shift_end_datetime = datetime.combine(shift_date, shift_end_time)
+
+            if shift_overlap(shift_start_datetime, shift_end_datetime, request_start_datetime, request_end_datetime):
+                return False 
+
+        if shift_day in availability:
+            employee_availability = availability[shift_day]
+            employee_start_time = datetime.strptime(employee_availability['start_time'], "%H:%M").time()
+            employee_end_time = datetime.strptime(employee_availability['end_time'], "%H:%M").time()
+
+            if (
+                employee_start_time <= shift_start_time <= employee_end_time
+                and employee_start_time <= shift_end_time <= employee_end_time
+            ):
+                return True 
+        return False 
+    except Exception as e:
+        traceback.print_exc()
         return False
+
+def shift_overlap(shift_start, shift_end, request_start, request_end):
+    return shift_start <= request_end and shift_end >= request_start
+
+
 
 def edit_employee(employee_id, employee_data):
     try:

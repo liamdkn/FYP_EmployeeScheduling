@@ -10,11 +10,10 @@ CORS(shift_blueprint)
 def create_shifts_route():
     try:
         shifts_data = request.json
-        print(shifts_data)
         response_data = create_shifts(shifts_data)
         return jsonify({'shifts_id': response_data}), 201
     except Exception as e:
-        traceback.print_exc()  # Print the stack trace
+        traceback.print_exc()
         return jsonify({'error': str(e), 'stack_trace': traceback.format_exc()}), 400
 
 

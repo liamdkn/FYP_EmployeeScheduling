@@ -10,9 +10,9 @@ CORS(request_blueprint)
 def create_request_route():
     try:
         request_data = request.json
-        print(request_data)
+        user_id = request.headers.get('User-id')
 
-        response_data = create_request(request_data)
+        response_data = create_request(request_data, user_id)
         return jsonify(response_data), 201
     except Exception as e:
         print("Error in requesst route")
@@ -23,7 +23,8 @@ def create_request_route():
 @request_blueprint.route('/requests', methods=['GET'])
 def get_requests_route():
     try:
-        requests_data = get_all_requests()
+        user_id = request.headers.get('User-id')
+        requests_data = get_all_requests(user_id)
         requests_dict = [request.to_dict() for request in requests_data]
         return jsonify(requests_dict), 200
     except Exception as e:

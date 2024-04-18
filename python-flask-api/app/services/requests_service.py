@@ -1,16 +1,22 @@
 from flask import current_app
 from app.models.requests_model import TimeOffRequest
+from app.services.employee_service import is_user_employee
+from app.services.business_service import is_user_business
 from datetime import time
 
-def create_request(request_data):
+import traceback
+
+def create_request(request_data, user_id):
+    print("creating request")
     try:
         db = current_app.config['FIRESTORE_CLIENT']
         request_ref = db.collection('requests')  
 
         # Drop the request_id field from the request_data
         request_data.pop('request_id', None)
+        request_data.pop('employee_id', None)
 
-        new_request = TimeOffRequest(request_id=None, **request_data)
+        new_request = TimeOffRequest(employee_id=user_id, **request_data)
         request_dict = new_request.to_dict()
 
         new_request_ref = request_ref.add(request_dict)
@@ -25,29 +31,56 @@ def create_request(request_data):
         return response_data
 
     except Exception as e:
-        return {"error": f"Error submitting request: {str(e)}"}
+        traceback.print_exc()  # Print the stack trace
+        return {"error": f"Error submitting request: {str(e)}"}, 
 
 
 
-def get_all_requests():
+
+def get_all_requests(user_id):
+    if is_user_employee(user_id):
+        user_type = 'employee'
+        employee_id = user_id
+    elif is_user_business(user_id):
+        user_type = 'business'
+    else:
+        return jsonify({'error': 'User not found or has no type'}), 404
+
     try:
         db = current_app.config['FIRESTORE_CLIENT']
         request_ref = db.collection('requests')
-
         requests = []
 
         for doc in request_ref.stream():
             request_data = doc.to_dict()
-            request_data['request_id'] = doc.id
-            request_object = TimeOffRequest(**request_data)
-            requests.append(request_object)
+            if not request_data.get('is_deleted', False):
+                request_object = TimeOffRequest(**request_data)
+                if user_type == 'business' or (user_type == 'employee' and request_object.employee_id == employee_id):
+                    requests.append(request_object)
 
-        # Return the list of TimeOffRequest objects
         return requests
 
     except Exception as e:
         return {"error": f"Error retrieving requests: {str(e)}"}
 
+
+
+def get_approved_requests():
+    try:
+        db = current_app.config['FIRESTORE_CLIENT']
+        request_ref = db.collection('requests')
+        approved_requests = []
+
+        for doc in request_ref.where('status', '==', 'Approved').stream():
+            request_data = doc.to_dict()
+            if not request_data.get('is_deleted', False):
+                request_object = TimeOffRequest(**request_data)
+                approved_requests.append(request_object)
+
+        return approved_requests
+
+    except Exception as e:
+        return {"error": f"Error retrieving approved requests: {str(e)}"}
 
 
 def approve_request(request_id):

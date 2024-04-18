@@ -14,6 +14,7 @@ class TimeOffRequest:
         self.is_deleted = is_deleted
         self.is_all_day = is_all_day
 
+
     def to_dict(self):
         return {
             "request_id": self.request_id,

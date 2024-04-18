@@ -1,6 +1,6 @@
 from flask import Blueprint, jsonify, request
 from flask_cors import CORS
-from app.services.business_service import create_business
+from app.services.business_service import *
 
 business_blueprint = Blueprint('business', __name__)
 CORS(business_blueprint)
@@ -12,10 +12,17 @@ def create_business_route():
     return jsonify({'business_id': business_id}), 201
 
 
+import traceback
+
 @business_blueprint.route('/business/<business_id>', methods=['GET'])
 def get_business_by_id_route(business_id):
-    business = get_business_by_id(business_id)
-    if business:
-        return jsonify(business), 200
-    else:
-        return jsonify({'error': 'Business not found'}), 404
+    try:
+        business = get_business_by_id(business_id)
+        if business:
+            business_dict = business.to_dict()
+            return jsonify(business_dict), 200
+        else:
+            return jsonify({'error': 'Business not found'}), 404
+    except Exception as e:
+        traceback.print_exc()
+        return jsonify({'error': 'Internal server error'}), 500

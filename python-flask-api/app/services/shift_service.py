@@ -25,7 +25,6 @@ def get_shifts_by_id(shifts_id):
             for shift_data in shifts_data:
                 shift = Ind_Shift(**shift_data)
                 shifts.append(shift)
-            print("Shifts retrieved:", shifts)
             return shifts
         else:
             print("Shifts document not found")
@@ -42,7 +41,6 @@ def get_shifts_by_id(shifts_id):
 
 def create_shifts(shifts_data):
     try:
-        print(shifts_data)
         db = current_app.config['FIRESTORE_CLIENT']
         shifts_ref = db.collection('shifts')
 
