@@ -207,15 +207,22 @@ def generate_roster(individual_shifts, employees, approvedRequests):
     days = DAYS_OF_WEEK
     num_selection = NUM_SELECTED
     population_size = len(individual_shifts)
-    #individual_shifts, num_shifts = create_individual_shifts(shifts) #Split shifts into individual shift objects 
-    if(employees == None):
-        print("shifts or emp are none")
-
     num_shifts = len(individual_shifts)
-    initial_population = initialise_population(INITIAL_POPUL_COUNT, employees, num_shifts) #Create random population for these shifts X times, where X = INITIAL_POPUL_COUNT
-    population_with_fitness = calculate_inital_fitness(initial_population, individual_shifts, employees, approvedRequests)
-    chromosome, generations = algorithm(population_with_fitness, individual_shifts, employees, num_selection, population_size, approvedRequests)
-    assigned_shifts = assign_shifts(chromosome['chromosome'], individual_shifts, employees)
+    max_generations = 1000  
 
+    while True: 
+        initial_population = initialise_population(INITIAL_POPUL_COUNT, employees, num_shifts)
+        population_with_fitness = calculate_inital_fitness(initial_population, individual_shifts, employees, approvedRequests)
+        chromosome, generations = algorithm(population_with_fitness, individual_shifts, employees, num_selection, population_size, approvedRequests)
+        
+        if chromosome['conflicts'] == 0: 
+            break
+        elif generations > max_generations: #restart if generations hit 1000, probs in local mix/min
+            print("Max generations exceeded. Restarting the process...")
+            continue
+
+    assigned_shifts = assign_shifts(chromosome['chromosome'], individual_shifts, employees)
+    
     print("DEBUG: Roster generation script complete")
     return assigned_shifts, generations, chromosome['conflicts'], chromosome['fitness']
+
