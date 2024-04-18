@@ -24,8 +24,12 @@ app.config['MAIL_PASSWORD'] = 'your_email_password'
 
 mail = Mail(app)
 
-json_key_path = 'rostergenerator2-firebase-adminsdk-nu4ix-f5e7b904a7.json'
+json_key_path = '/etc/secrets/rostergenerator2-firebase-adminsdk-nu4ix-f5e7b904a7.json'
 cred = json.loads(open(json_key_path).read())
+
+@app.route('/')
+def index():
+    return 'Welcome to My Flask App'
 
 # single firestore instance
 db = firestore.Client.from_service_account_info(cred)
