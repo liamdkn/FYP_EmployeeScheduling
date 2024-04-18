@@ -11,7 +11,7 @@ __pycache__/
 my_app/lib/views/Template.txt
 
 # Ignore __init__.py files
-**/__init__.py
+
 
 python-flask-api/app/routes/__pycache__/shift_routes.cpython-39.pyc
 
