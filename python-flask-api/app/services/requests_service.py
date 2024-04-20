@@ -2,7 +2,11 @@ from flask import current_app
 from app.models.requests_model import TimeOffRequest
 from app.services.employee_service import is_user_employee
 from app.services.business_service import is_user_business
+from app.services.employee_service import get_employees
+from app.services.email_service import email_emergency_request
 from datetime import time
+from constants import *
+
 
 import traceback
 
@@ -16,17 +20,21 @@ def create_request(request_data, user_id):
         request_data.pop('request_id', None)
         request_data.pop('employee_id', None)
 
-        new_request = TimeOffRequest(employee_id=user_id, **request_data)
+        new_request = TimeOffRequest(request_id= None,employee_id=user_id, **request_data)
         request_dict = new_request.to_dict()
-
+        
         new_request_ref = request_ref.add(request_dict)
 
-        request_id = new_request_ref[1].id
-        request_dict['id'] = request_id
+        request_doc_id = new_request_ref[1].id
+        new_request.request_id = request_doc_id
+
+        is_emergency = request_data.get('is_emergency', False)  # Check if is_emergency is True
+        if is_emergency:
+            emergencyRequest(new_request)
 
         response_data = {
             "status": "Request submitted successfully",
-            "request_id": request_id
+            "request_id": request_doc_id
         }
         return response_data
 
@@ -35,6 +43,10 @@ def create_request(request_data, user_id):
         return {"error": f"Error submitting request: {str(e)}"}, 
 
 
+def emergencyRequest(request):
+    print("Emergency request recieved with ID:", request.request_id)
+
+    email_emergency_request(BUSINESS_EMAIL, request)
 
 
 def get_all_requests(user_id):
@@ -62,6 +74,7 @@ def get_all_requests(user_id):
         return requests
 
     except Exception as e:
+        traceback.print_exc()
         return {"error": f"Error retrieving requests: {str(e)}"}
 
 

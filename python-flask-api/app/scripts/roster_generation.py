@@ -150,12 +150,12 @@ def mutate_population(population, employees, mutation_rate):
     return mutated_population
 
 
-def algorithm(next_generation, individual_shifts, employees, num_selection, population_size, approvedRequests):
+def algorithm(next_generation, individual_shifts, employees, num_selection, population_size, approvedRequests, max_generations):
     generations = 0
     winner = next_generation
     conflicts = winner[0]['conflicts']  # Initialize conflicts here
 
-    while conflicts > 0:  # Check against conflicts instead of next_generation[0]['conflicts']
+    while conflicts > 0 and generations < max_generations:  
         generations += 1
         for individual in next_generation:
             individual['fitness'], individual['conflicts'] = calculate_fitness(individual['chromosome'], individual_shifts, employees, approvedRequests)
@@ -216,12 +216,16 @@ def generate_roster(individual_shifts, employees, approvedRequests):
     max_generations = 150
 
 
-    initial_population = initialise_population(INITIAL_POPUL_COUNT, employees, num_shifts)
-    population_with_fitness = calculate_inital_fitness(initial_population, individual_shifts, employees, approvedRequests)
-    chromosome, generations, conflicts = algorithm(population_with_fitness, individual_shifts, employees, num_selection, population_size, approvedRequests)
-
+    for _ in range(5):  
+        initial_population = initialise_population(INITIAL_POPUL_COUNT, employees, num_shifts)
+        population_with_fitness = calculate_inital_fitness(initial_population, individual_shifts, employees, approvedRequests)
+        chromosome, generations, conflicts = algorithm(population_with_fitness, individual_shifts, employees, num_selection, population_size, approvedRequests, max_generations)
+        if generations < max_generations:
+            break
+        print(f"Restarting roster generation, last attempt reached {generations} generations.")
 
     assigned_shifts = assign_shifts(chromosome['chromosome'], individual_shifts, employees)
+    print(f"Final chromosome: {chromosome}, Generations: {generations}, Conflicts: {chromosome['conflicts']}, Fitness: {chromosome['fitness']}")
     
     print("DEBUG: Roster generation script complete")
     return assigned_shifts, generations, chromosome['conflicts'], chromosome['fitness']
