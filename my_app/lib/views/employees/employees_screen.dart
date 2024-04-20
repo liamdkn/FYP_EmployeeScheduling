@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:my_app/models/employee_model.dart';
 import 'package:my_app/views/employees/components/employee_register_widget.dart';
 import 'package:my_app/views/main/components/custom_elevated_button.dart';
-import 'package:my_app/views/employees/components/employee_edit_widget.dart';
 import 'package:my_app/views/main/components/custom_bottom_screen.dart';
 import 'package:my_app/services/employee_service.dart';
 import 'package:my_app/views/main/components/header_widget.dart';
-import 'package:my_app/views/employees/components/employee_list_widget.dart';
+import 'package:my_app/views/employees/components/employees_data_table.dart';
 import '../../../constants.dart';
-import '../../responsive.dart';
 
 class EmployeesScreen extends StatefulWidget {
   @override
@@ -16,7 +15,7 @@ class EmployeesScreen extends StatefulWidget {
 
 class _EmployeesScreenState extends State<EmployeesScreen> {
   final EmployeeService _employeeService = EmployeeService();
-  List<Map<String, dynamic>> _employees = [];
+  List<Employee> _employees = [];
 
   @override
   void initState() {
@@ -26,17 +25,21 @@ class _EmployeesScreenState extends State<EmployeesScreen> {
 
   Future<void> _fetchEmployees() async {
     try {
-      final List<Map<String, dynamic>> employeeList =
-          await _employeeService.getEmployees();
+      final List<Employee> employeeList = await _employeeService.getEmployees();
 
       if (mounted) {
         setState(() {
           _employees = employeeList;
         });
       }
-    } catch (error) {
-      print('Error fetching employees: $error');
+    } catch (error, stackTrace) {
+      print('Error in employee screen fetching employees: $error');
+      print('Stack trace: $stackTrace');
     }
+  }
+
+  void _updateEmployeesList() {
+    _fetchEmployees();
   }
 
   @override
@@ -44,13 +47,13 @@ class _EmployeesScreenState extends State<EmployeesScreen> {
     return SafeArea(
       child: SingleChildScrollView(
         primary: false,
-        padding: EdgeInsets.all(defaultPadding),
+        padding: const EdgeInsets.all(defaultPadding),
         child: Column(
           children: [
-            Header(
+            const Header(
               title: 'Employees',
             ),
-            SizedBox(height: headerPadding),
+            const SizedBox(height: headerPadding),
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
@@ -61,25 +64,28 @@ class _EmployeesScreenState extends State<EmployeesScreen> {
                       text: 'Create Employee',
                       onPressed: () {
                         customModalBottomSheet(
-                            context: context,
-                            height: 700.0,
-                            child: RegisterEmployee());
+                          context: context,
+                          height: 750.0,
+                          child: SizedBox(
+                            height: 750.0,
+                            width: 700.0,
+                            child: RegisterEmployee(),
+                          ),
+                        );
                       },
                     ),
                   ),
                 ),
               ],
             ),
-            SizedBox(height: defaultPadding),
+            const SizedBox(height: defaultPadding),
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Expanded(
-                  flex: 5,
-                  child: Column(
-                    children: [
-                      EmployeeList(employees: _employees),
-                    ],
+                  child: EmployeesDataTable(
+                    employees: _employees,
+                    onUpdate: _updateEmployeesList,
                   ),
                 ),
               ],

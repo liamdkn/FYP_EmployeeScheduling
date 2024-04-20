@@ -14,7 +14,7 @@ class EmployeeListWidget extends StatefulWidget {
 }
 
 class _EmployeeListWidgetState extends State<EmployeeListWidget> {
-  List<String> _selectedEmployeeIds = []; // Store selected employee IDs here
+  List<String> _selectedEmployeeIds = [];
   late Future<List<Employee>> _employeesFuture;
   bool _selectAll = false;
 
@@ -30,21 +30,21 @@ class _EmployeeListWidgetState extends State<EmployeeListWidget> {
       future: _employeesFuture,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return Center(child: CircularProgressIndicator());
+          return const Center(child: CircularProgressIndicator());
         } else if (snapshot.hasError) {
           return Center(child: Text('Error: ${snapshot.error}'));
         } else {
           List<Employee>? employees = snapshot.data;
           if (employees != null && employees.isNotEmpty) {
             return Container(
-              margin: EdgeInsets.all(10.0),
+              margin: const EdgeInsets.all(10.0),
               decoration: BoxDecoration(
                 boxShadow: [
                   BoxShadow(
                     color: Colors.grey.withOpacity(0.5),
                     spreadRadius: 5,
                     blurRadius: 7,
-                    offset: Offset(0, 3),
+                    offset: const Offset(0, 3),
                   ),
                 ],
                 border: Border.all(
@@ -57,7 +57,7 @@ class _EmployeeListWidgetState extends State<EmployeeListWidget> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Padding(
+                  const Padding(
                     padding: EdgeInsets.all(8.0),
                     child: Text(
                       'Select Available Employees',
@@ -91,10 +91,10 @@ class _EmployeeListWidgetState extends State<EmployeeListWidget> {
                       ],
                     ),
                   ),
-                  SizedBox(height: 8.0),
+                  const SizedBox(height: 8.0),
                   ListView.builder(
                     shrinkWrap: true,
-                    physics: NeverScrollableScrollPhysics(),
+                    physics: const NeverScrollableScrollPhysics(),
                     itemCount: employees.length,
                     itemBuilder: (context, index) {
                       Employee employee = employees[index];
@@ -103,7 +103,7 @@ class _EmployeeListWidgetState extends State<EmployeeListWidget> {
                         child: CheckboxListTile(
                           title: Text(
                             '${employee.firstName} ${employee.lastName}',
-                            style: TextStyle(color: Colors.black),
+                            style: const TextStyle(color: Colors.black),
                           ),
                           value: _selectedEmployeeIds.contains(employee.id),
                           onChanged: (value) {
@@ -127,7 +127,7 @@ class _EmployeeListWidgetState extends State<EmployeeListWidget> {
               ),
             );
           } else {
-            return Center(child: Text('No employees available'));
+            return const Center(child: Text('No employees available'));
           }
         }
       },

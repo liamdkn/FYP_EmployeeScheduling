@@ -6,8 +6,11 @@ import 'package:my_app/views/requests/components/requests_edit_widget.dart';
 
 class RequestListTable extends StatelessWidget {
   final List<TimeOffRequest> requests;
+  final Function() onUpdate;
 
-  RequestListTable({Key? key, required this.requests}) : super(key: key);
+  const RequestListTable(
+      {Key? key, required this.requests, required this.onUpdate})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -59,7 +62,8 @@ class RequestListTable extends StatelessWidget {
                       customModalBottomSheet(
                         context: context,
                         height: 450.0,
-                        child: EditRequest(request: request),
+                        child:
+                            EditRequest(request: request, onUpdate: onUpdate),
                       );
                     },
                   ),

@@ -60,7 +60,7 @@ def create_roster_route():
 
 
 @roster_blueprint.route('/rosters/<string:roster_id>', methods=['PUT'])
-def soft_delete_employee_route(roster_id):
+def soft_delete_roster_route(roster_id):
     response_data, status_code = soft_delete_roster(roster_id)
     if status_code == 200:
         return jsonify({'message': response_data['status']}), 200

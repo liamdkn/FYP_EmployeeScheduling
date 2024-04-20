@@ -7,8 +7,12 @@ import 'package:my_app/views/main/components/custom_elevated_button.dart';
 class EditRequest extends StatelessWidget {
   final TimeOffRequest request;
   final RequestService requestService = RequestService();
+  final Function() onUpdate; // Add onUpdate parameter
 
-  EditRequest({required this.request});
+  EditRequest({
+    required this.request,
+    required this.onUpdate, // Pass the onUpdate callback as a parameter
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -39,7 +43,10 @@ class EditRequest extends StatelessWidget {
                 width: double.infinity,
                 child: CustomElevatedButton(
                   onPressed: () {
-                    _approveRequest(request.requestId!);
+                    //_approveRequest(context, request.requestId!);
+                    requestService.approveTimeOffRequest(request.requestId!);
+                    onUpdate();
+                    Navigator.pop(context);
                   },
                   text: 'Approve',
                   color: Colors.green,
@@ -50,7 +57,10 @@ class EditRequest extends StatelessWidget {
                 width: double.infinity,
                 child: CustomElevatedButton(
                   onPressed: () {
-                    _denyRequest(request.requestId!);
+                    //_denyRequest(context, request.requestId!);
+                    requestService.denyTimeOffRequest(request.requestId!);
+                    onUpdate();
+                    Navigator.pop(context);
                   },
                   text: 'Deny',
                   color: Colors.red,
@@ -62,16 +72,22 @@ class EditRequest extends StatelessWidget {
       ),
     );
   }
-
-  void _approveRequest(String requestId) async {
+/*
+  void _approveRequest(BuildContext context, String requestId) async {
+    final currentContext = context;
     try {
       await requestService.approveTimeOffRequest(requestId);
+      onUpdate();
+      Navigator.pop(currentContext);
     } catch (error) {}
   }
 
-  void _denyRequest(String requestId) async {
+  void _denyRequest(BuildContext context, String requestId) async {
+    final currentContext = context;
     try {
       await requestService.denyTimeOffRequest(requestId);
+      onUpdate();
+      Navigator.pop(currentContext);
     } catch (error) {}
-  }
+  }*/
 }

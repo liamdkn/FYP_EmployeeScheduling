@@ -44,21 +44,20 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyBFeDHFHmUOXMR8XgNZ_wNWAUT7FGpCHu0',
-    appId: '1:929392117103:web:3b21ee563dd2cb042c149a',
-    messagingSenderId: '929392117103',
-    projectId: 'rostergenerator-6bee3',
-    authDomain: 'rostergenerator-6bee3.firebaseapp.com',
-    databaseURL: 'https://rostergenerator-6bee3-default-rtdb.europe-west1.firebasedatabase.app',
-    storageBucket: 'rostergenerator-6bee3.appspot.com',
-  );
+      apiKey: "AIzaSyD6rwSkQWe4JIUbI_-RRlhdecRMrR_dlmM",
+      authDomain: "rostergenerator2.firebaseapp.com",
+      projectId: "rostergenerator2",
+      storageBucket: "rostergenerator2.appspot.com",
+      messagingSenderId: "1088162351236",
+      appId: "1:1088162351236:web:84724082f37c4213b39ad1");
 
   static const FirebaseOptions android = FirebaseOptions(
     apiKey: 'AIzaSyC7CxZN82Y05gifvKbksVNgPPAWr00S96U',
     appId: '1:929392117103:android:fc252002400860d82c149a',
     messagingSenderId: '929392117103',
     projectId: 'rostergenerator-6bee3',
-    databaseURL: 'https://rostergenerator-6bee3-default-rtdb.europe-west1.firebasedatabase.app',
+    databaseURL:
+        'https://rostergenerator-6bee3-default-rtdb.europe-west1.firebasedatabase.app',
     storageBucket: 'rostergenerator-6bee3.appspot.com',
   );
 
@@ -67,7 +66,8 @@ class DefaultFirebaseOptions {
     appId: '1:929392117103:ios:033bba3fd5a421082c149a',
     messagingSenderId: '929392117103',
     projectId: 'rostergenerator-6bee3',
-    databaseURL: 'https://rostergenerator-6bee3-default-rtdb.europe-west1.firebasedatabase.app',
+    databaseURL:
+        'https://rostergenerator-6bee3-default-rtdb.europe-west1.firebasedatabase.app',
     storageBucket: 'rostergenerator-6bee3.appspot.com',
     iosBundleId: 'com.example.myApp',
   );
@@ -77,7 +77,8 @@ class DefaultFirebaseOptions {
     appId: '1:929392117103:ios:0854a1696075214f2c149a',
     messagingSenderId: '929392117103',
     projectId: 'rostergenerator-6bee3',
-    databaseURL: 'https://rostergenerator-6bee3-default-rtdb.europe-west1.firebasedatabase.app',
+    databaseURL:
+        'https://rostergenerator-6bee3-default-rtdb.europe-west1.firebasedatabase.app',
     storageBucket: 'rostergenerator-6bee3.appspot.com',
     iosBundleId: 'com.example.myApp.RunnerTests',
   );

@@ -1,5 +1,5 @@
 class TimeOffRequest:
-    def __init__(self, employee_id, start_date, end_date, start_time, end_time, request_type, reason, status, is_emergency, submission_date, request_id=None, is_deleted=False, is_all_day=False):
+    def __init__(self, request_id, employee_id, start_date, end_date, start_time, end_time, request_type, reason, status, is_emergency, submission_date, is_deleted=False, is_all_day=False):
         self.request_id = request_id
         self.employee_id = employee_id
         self.start_date = start_date

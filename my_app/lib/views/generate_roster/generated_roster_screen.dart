@@ -5,9 +5,9 @@ import 'package:my_app/views/main/components/custom_elevated_button.dart';
 import 'package:my_app/views/rosters/components/roster_display_widget.dart';
 
 class GeneratedRosterScreen extends StatelessWidget {
-  final Roster roster;
   final RosterService _rosterService = RosterService();
-  String? rosterId;
+  final Roster roster;
+  late String rosterId;
 
   GeneratedRosterScreen(this.roster, {super.key});
 

@@ -2,8 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:my_app/views/user_auth/componenets/form_container_widget.dart';
-import 'package:my_app/services/user_auth_services.dart';
-import 'package:my_app/views/user_auth/user_auth_provider.dart';
+import 'package:my_app/services/user_auth_service.dart';
 import 'package:my_app/views/user_auth/user_signup_page.dart';
 import 'package:provider/provider.dart';
 
@@ -20,10 +19,10 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  final FirebaseAuthService _auth = FirebaseAuthService();
+  //final FirebaseAuthService _auth = FirebaseAuthService();
 
   bool _isSigning = false;
-  final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
+  final UserAuthProvider _authProvider = UserAuthProvider();
   TextEditingController _emailController = TextEditingController();
   TextEditingController _passwordController = TextEditingController();
 
@@ -46,7 +45,7 @@ class _LoginPageState extends State<LoginPage> {
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
-        title: Text("Login"),
+        title: const Text("Login"),
       ),
       body: Center(
         child: Padding(
@@ -54,33 +53,25 @@ class _LoginPageState extends State<LoginPage> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text(
+              const Text(
                 "Login",
                 style: TextStyle(fontSize: 27, fontWeight: FontWeight.bold),
               ),
-              SizedBox(
-                height: 30,
-              ),
+              const SizedBox(height: 30),
               FormContainerWidget(
                 controller: _emailController,
                 hintText: "Email",
                 isPasswordField: false,
               ),
-              SizedBox(
-                height: 10,
-              ),
+              const SizedBox(height: 10),
               FormContainerWidget(
                 controller: _passwordController,
                 hintText: "Password",
                 isPasswordField: true,
               ),
-              SizedBox(
-                height: 30,
-              ),
+              const SizedBox(height: 30),
               GestureDetector(
-                onTap: () {
-                  _signIn();
-                },
+                onTap: _isSigning ? null : _signIn,
                 child: Container(
                   width: double.infinity,
                   height: 45,
@@ -90,10 +81,8 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                   child: Center(
                     child: _isSigning
-                        ? CircularProgressIndicator(
-                            color: Colors.white,
-                          )
-                        : Text(
+                        ? const CircularProgressIndicator(color: Colors.white)
+                        : const Text(
                             "Login",
                             style: TextStyle(
                               color: Colors.white,
@@ -103,25 +92,22 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                 ),
               ),
-              SizedBox(
-                height: 20,
-              ),
+              const SizedBox(height: 20),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text("Don't have an account?"),
-                  SizedBox(
-                    width: 5,
-                  ),
+                  const Text("Don't have an account?"),
+                  const SizedBox(width: 5),
                   GestureDetector(
                     onTap: () {
                       Navigator.pushAndRemoveUntil(
                         context,
-                        MaterialPageRoute(builder: (context) => SignUpPage()),
+                        MaterialPageRoute(
+                            builder: (context) => const SignUpPage()),
                         (route) => false,
                       );
                     },
-                    child: Text(
+                    child: const Text(
                       "Sign Up",
                       style: TextStyle(
                         color: Colors.blue,
@@ -147,25 +133,16 @@ class _LoginPageState extends State<LoginPage> {
     String password = _passwordController.text;
 
     try {
-      UserCredential userCredential =
-          await _firebaseAuth.signInWithEmailAndPassword(
-        email: email,
-        password: password,
-      );
-
-      User? user = userCredential.user;
+      User? user = await _authProvider.signIn(email, password);
 
       setState(() {
         _isSigning = false;
       });
 
-      if (user != null) {
-        context.read<AuthUserProvider>().setUser(user);
-        print("User is successfully signed in");
-        Navigator.pushNamed(context, "/home");
-      } else {
-        print("Some error occurred during sign-in");
-      }
+      print("User is successfully signed in");
+      Provider.of<UserAuthProvider>(context, listen: false)
+          .setUserAndType(user);
+      Navigator.pushReplacementNamed(context, '/');
     } catch (e) {
       print("Error signing in: $e");
       setState(() {

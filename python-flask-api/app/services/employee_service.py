@@ -56,17 +56,15 @@ def get_employees():
 
         for employee_doc in employees_ref.stream():
             employee_data = employee_doc.to_dict()
-        #employee_id = employee_doc.id
-            employee = Employee(**employee_data)
-            employees.append(employee)
+            if not employee_data.get('is_deleted', False):
+                employee = Employee(**employee_data)
+                employees.append(employee)
 
         return employees
 
     except Exception as e:
         print(f"Error retrieving employees: {str(e)}")
         return []
-
-
 import traceback
 
 def get_employees_by_id(employee_ids):

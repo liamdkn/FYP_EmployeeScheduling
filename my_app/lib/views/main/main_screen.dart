@@ -2,16 +2,17 @@
 
 import 'package:my_app/controllers/MenuAppController.dart';
 import 'package:my_app/responsive.dart';
+import 'package:my_app/services/user_auth_service.dart';
 import 'package:my_app/views/dashboard/dashboard_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:my_app/views/generate_roster/generate_roster_screen.dart';
+import 'package:my_app/views/profile/profile_screen.dart';
 import 'package:my_app/views/rosters/roster_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:my_app/views/main/components/side_menu.dart';
 
 import '../employees/employees_screen.dart';
 import '../requests/requests_screen.dart';
-import '../settings/settings_screen.dart';
 
 class MainScreen extends StatefulWidget {
   @override
@@ -19,7 +20,15 @@ class MainScreen extends StatefulWidget {
 }
 
 class _MainScreenState extends State<MainScreen> {
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+
   int _selectedIndex = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    context.read<MenuAppController>().setScaffoldKey(_scaffoldKey);
+  }
 
   void _onMenuItemSelected(int index) {
     setState(() {
@@ -29,8 +38,10 @@ class _MainScreenState extends State<MainScreen> {
 
   @override
   Widget build(BuildContext context) {
+    String? userType = Provider.of<UserAuthProvider>(context).userType;
+
     return Scaffold(
-      key: context.read<MenuAppController>().scaffoldKey,
+      key: _scaffoldKey,
       drawer: SideMenu(
         selectedIndex: _selectedIndex,
         onItemSelected: _onMenuItemSelected,
@@ -39,18 +50,14 @@ class _MainScreenState extends State<MainScreen> {
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // this side menu only for large screen
             if (Responsive.isDesktop(context))
               Expanded(
-                // default flex = 1
-                // and it takes 1/6 part of the screen
                 child: SideMenu(
                   selectedIndex: _selectedIndex,
                   onItemSelected: _onMenuItemSelected,
                 ),
               ),
             Expanded(
-              // takes 5/6 part of the screen
               flex: 5,
               child: _buildSelectedScreen(),
             ),
@@ -73,9 +80,7 @@ class _MainScreenState extends State<MainScreen> {
       case 4:
         return RequestsScreen();
       case 5:
-        return Text("Profile Screen");
-      case 6:
-        return SettingsScreen();
+        return ProfileScreen();
       default:
         return DashboardScreen();
     }

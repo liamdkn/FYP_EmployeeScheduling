@@ -16,14 +16,14 @@ class TimeOffRequestForm extends StatefulWidget {
 }
 
 class _TimeOffRequestFormState extends State<TimeOffRequestForm> {
-  final _formKey = GlobalKey<FormBuilderState>();
+  final _formKeyTimeOffRequest = GlobalKey<FormBuilderState>();
 
   final RequestService _requestService = RequestService();
 
   @override
   Widget build(BuildContext context) {
     return FormBuilder(
-      key: _formKey,
+      key: _formKeyTimeOffRequest,
       autovalidateMode: AutovalidateMode.onUserInteraction,
       skipDisabled: true,
       child: Column(
@@ -127,8 +127,9 @@ class _TimeOffRequestFormState extends State<TimeOffRequestForm> {
   }
 
   void _submitForm() {
-    if (_formKey.currentState!.saveAndValidate()) {
-      Map<String, dynamic> formData = _formKey.currentState!.value;
+    if (_formKeyTimeOffRequest.currentState!.saveAndValidate()) {
+      Map<String, dynamic> formData =
+          _formKeyTimeOffRequest.currentState!.value;
 
       DateTime startDateTime = formData['startDateTime'];
       String startDate = DateFormat('dd-MM-yyyy').format(startDateTime);
@@ -155,7 +156,7 @@ class _TimeOffRequestFormState extends State<TimeOffRequestForm> {
 
       _requestService.createTimeOffRequest(employeeRequest);
 
-      _formKey.currentState!.reset();
+      _formKeyTimeOffRequest.currentState!.reset();
     }
   }
 }

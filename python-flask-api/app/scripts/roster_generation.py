@@ -153,8 +153,9 @@ def mutate_population(population, employees, mutation_rate):
 def algorithm(next_generation, individual_shifts, employees, num_selection, population_size, approvedRequests):
     generations = 0
     winner = next_generation
+    conflicts = winner[0]['conflicts']  # Initialize conflicts here
 
-    while next_generation[0]['conflicts'] > 0:
+    while conflicts > 0:  # Check against conflicts instead of next_generation[0]['conflicts']
         generations += 1
         for individual in next_generation:
             individual['fitness'], individual['conflicts'] = calculate_fitness(individual['chromosome'], individual_shifts, employees, approvedRequests)
@@ -175,8 +176,11 @@ def algorithm(next_generation, individual_shifts, employees, num_selection, popu
         next_generation = next_generation[:population_size]
 
         winner = next_generation[0]
+        conflicts = winner['conflicts']  # Update conflicts here
         print("Generation: ", generations)
-    return winner, generations
+    print("conflicts")
+    return winner, generations, conflicts
+
 
 
 def print_roster(chromosome, individual_shifts, employees, approvedRequests):
@@ -187,7 +191,7 @@ def print_roster(chromosome, individual_shifts, employees, approvedRequests):
     employee_names = [next((employee.firstname for employee in employees if employee.id == employee_id), None) for employee_id in chromosome]
     employee_names = [name for name in employee_names if name is not None]
 
-     # Get the shift days
+    # Get the shift days
     shift_days = [shift.day for shift in individual_shifts]
 
     # Print the roster with employee names and shift days
@@ -203,23 +207,19 @@ def assign_shifts(chromosome, individual_shifts, employees):
 
 
 
+
 def generate_roster(individual_shifts, employees, approvedRequests):
     days = DAYS_OF_WEEK
     num_selection = NUM_SELECTED
     population_size = len(individual_shifts)
     num_shifts = len(individual_shifts)
-    max_generations = 1000  
+    max_generations = 150
 
-    while True: 
-        initial_population = initialise_population(INITIAL_POPUL_COUNT, employees, num_shifts)
-        population_with_fitness = calculate_inital_fitness(initial_population, individual_shifts, employees, approvedRequests)
-        chromosome, generations = algorithm(population_with_fitness, individual_shifts, employees, num_selection, population_size, approvedRequests)
-        
-        if chromosome['conflicts'] == 0: 
-            break
-        elif generations > max_generations: #restart if generations hit 1000, probs in local mix/min
-            print("Max generations exceeded. Restarting the process...")
-            continue
+
+    initial_population = initialise_population(INITIAL_POPUL_COUNT, employees, num_shifts)
+    population_with_fitness = calculate_inital_fitness(initial_population, individual_shifts, employees, approvedRequests)
+    chromosome, generations, conflicts = algorithm(population_with_fitness, individual_shifts, employees, num_selection, population_size, approvedRequests)
+
 
     assigned_shifts = assign_shifts(chromosome['chromosome'], individual_shifts, employees)
     

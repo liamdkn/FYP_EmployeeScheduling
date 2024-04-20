@@ -1,13 +1,21 @@
 import 'package:flutter/material.dart';
 
 class MenuAppController extends ChangeNotifier {
-  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  GlobalKey<ScaffoldState>? _scaffoldKey;
 
-  GlobalKey<ScaffoldState> get scaffoldKey => _scaffoldKey;
+  void setScaffoldKey(GlobalKey<ScaffoldState> key) {
+    _scaffoldKey = key;
+  }
 
   void controlMenu() {
-    if (!_scaffoldKey.currentState!.isDrawerOpen) {
-      _scaffoldKey.currentState!.openDrawer();
+    try {
+      if (_scaffoldKey != null && !_scaffoldKey!.currentState!.isDrawerOpen) {
+        _scaffoldKey!.currentState!.openDrawer();
+      }
+    } catch (e, stackTrace) {
+      print("An error occurred in MenuAppController:");
+      print(e);
+      print(stackTrace);
     }
   }
 }

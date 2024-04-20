@@ -128,7 +128,6 @@ def generate_roster_service(rosterData, shifts_id, employee_ids):
         new_roster_ref = generated_rosters_ref.add(roster_dict)
         roster_id = new_roster_ref[1].id
 
-        export_roster_weekly_view(roster_id)
         return roster_dict, 201
     except Exception as e:
         print(f"Error generating roster: {e}")

@@ -1,14 +1,13 @@
 {
   "project_info": {
-    "project_number": "929392117103",
-    "firebase_url": "https://rostergenerator-6bee3-default-rtdb.europe-west1.firebasedatabase.app",
-    "project_id": "rostergenerator-6bee3",
-    "storage_bucket": "rostergenerator-6bee3.appspot.com"
+    "project_number": "1088162351236",
+    "project_id": "rostergenerator2",
+    "storage_bucket": "rostergenerator2.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:929392117103:android:fc252002400860d82c149a",
+        "mobilesdk_app_id": "1:1088162351236:android:537b47541d46090cb39ad1",
         "android_client_info": {
           "package_name": "com.example.my_app"
         }
@@ -16,7 +15,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyC7CxZN82Y05gifvKbksVNgPPAWr00S96U"
+          "current_key": "AIzaSyCCU_dgrYjqprXB8gZxjAiQJ3F3fVtLB7Y"
         }
       ],
       "services": {

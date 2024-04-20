@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:my_app/models/roster_model.dart';
 import 'package:my_app/responsive.dart';
+import 'package:my_app/services/user_auth_service.dart';
 import 'package:my_app/views/main/components/header_widget.dart';
 import 'package:my_app/views/rosters/components/roster_display_widget.dart';
 import 'package:my_app/views/rosters/components/roster_data_table.dart';
+import 'package:provider/provider.dart';
 import '../../../constants.dart';
 import 'package:my_app/services/roster_service.dart';
 
@@ -20,19 +22,36 @@ class _RosterScreenState extends State<RosterScreen> {
   @override
   void initState() {
     super.initState();
-    fetchRosters();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      fetchRosters();
+    });
     selectedRoster = null;
   }
 
   // Fetch rosters
   Future<void> fetchRosters() async {
-    final List<Roster>? fetchedRosters = await rosterService.fetchAllRosters();
-    if (fetchedRosters != null && fetchedRosters.isNotEmpty) {
+    final userType =
+        Provider.of<UserAuthProvider>(context, listen: false).userType ??
+            "employee";
+    final List<Roster> fetchedRosters =
+        await rosterService.fetchAllRosters(userType);
+
+    if (fetchedRosters.isNotEmpty) {
       setState(() {
         rosters = fetchedRosters;
         selectedRoster = fetchedRosters[0];
       });
     }
+  }
+
+  void handleRosterDeleted(String rosterId) {
+    rosterService.deleteRoster(rosterId);
+    setState(() {
+      rosters.removeWhere((roster) => roster.rosterId == rosterId);
+      if (selectedRoster?.rosterId == rosterId) {
+        selectedRoster = null;
+      }
+    });
   }
 
   @override
@@ -59,31 +78,25 @@ class _RosterScreenState extends State<RosterScreen> {
                     flex: 5,
                     child: Column(
                       children: [
-                        Container(
-                          child:
-                              RosterDisplayWidget(selectedRoster ?? rosters[0]),
-                        ),
+                        RosterDisplayWidget(selectedRoster ?? rosters[0]),
                         const SizedBox(height: defaultPadding),
-                        Container(
+                        SizedBox(
                           width: double.infinity,
                           child: RostersDataTable(
                             rosters: rosters,
                             onRosterSelected: (roster) {
                               handleRosterSelected(roster);
                             },
+                            onRosterDeleted: (rosterId) {
+                              handleRosterDeleted(rosterId);
+                            },
                           ),
                         ),
                         if (Responsive.isMobile(context))
                           const SizedBox(height: defaultPadding),
-                        if (Responsive.isMobile(context))
-                          Container(
-                            child: const Text("Storage 4"),
-                          ),
                       ],
                     ),
                   ),
-                  if (!Responsive.isMobile(context))
-                    const SizedBox(width: defaultPadding),
                 ],
               ),
           ],

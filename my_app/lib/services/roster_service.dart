@@ -1,14 +1,16 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:my_app/constants.dart';
 import 'package:my_app/models/roster_model.dart';
+import 'package:my_app/services/user_auth_service.dart';
 
 class RosterService {
-  static const String rosterURI = "http://127.0.0.1:5000/rosters";
+  static const String rosterEndpoint = "/rosters";
 
-  // Method to fetch assigned shifts for a roster
   Future<Roster> fetchRoster(String rosterId) async {
     try {
-      final response = await http.get(Uri.parse('$rosterURI/$rosterId'));
+      final response =
+          await http.get(Uri.parse('$APIURI$rosterEndpoint/$rosterId'));
 
       if (response.statusCode == 200) {
         final Map<String, dynamic> rosterData = jsonDecode(response.body);
@@ -25,9 +27,16 @@ class RosterService {
     }
   }
 
-  Future<List<Roster>> fetchAllRosters() async {
+  Future<List<Roster>> fetchAllRosters(userType) async {
     try {
-      final response = await http.get(Uri.parse(rosterURI));
+      final Map<String, String> headers = {
+        'User-Type': userType,
+      };
+
+      final response = await http.get(
+        Uri.parse('$APIURI$rosterEndpoint'),
+        headers: headers,
+      );
 
       if (response.statusCode == 200) {
         final List<Map<String, dynamic>> rosterDataList =
@@ -59,7 +68,7 @@ class RosterService {
       };
 
       final response = await http.post(
-        Uri.parse(rosterURI),
+        Uri.parse('$APIURI$rosterEndpoint'),
         body: jsonEncode(requestData),
         headers: {'Content-Type': 'application/json'},
       );
@@ -81,7 +90,7 @@ class RosterService {
     print("DEBUG: Exporting roster service");
     try {
       final response = await http.post(
-        Uri.parse('$rosterURI/export'),
+        Uri.parse('$APIURI$rosterEndpoint/export'),
         body: jsonEncode(roster.toJson()),
         headers: {'Content-Type': 'application/json'},
       );
@@ -99,13 +108,26 @@ class RosterService {
     }
   }
 
+  Future<void> deleteRoster(String rosterId) async {
+    final response = await http.put(
+      Uri.parse('$APIURI$rosterEndpoint/$rosterId'),
+      headers: {'Content-Type': 'application/json'},
+    );
+
+    if (response.statusCode == 200) {
+      print('Roster deleted successfully');
+    } else {
+      print('Failed to delete employee. Error: ${response.body}');
+    }
+  }
+
   Future<String> saveRoster(Roster roster) async {
     print("DEBUG: Saving roster service");
     try {
       final Map<String, dynamic> requestData = roster.toJson();
 
       final response = await http.post(
-        Uri.parse('$rosterURI/save'),
+        Uri.parse('$APIURI$rosterEndpoint/save'),
         body: jsonEncode(requestData),
         headers: {'Content-Type': 'application/json'},
       );
@@ -130,7 +152,7 @@ class RosterService {
     print("DEBUG: Publishing roster service");
     try {
       final response = await http.put(
-        Uri.parse('$rosterURI/publish/$rosterId'),
+        Uri.parse('$APIURI$rosterEndpoint/publish/$rosterId'),
         headers: {'Content-Type': 'application/json'},
       );
 

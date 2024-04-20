@@ -8,7 +8,7 @@ class Employee {
   final bool isDeleted;
   final String email;
   final String number;
-  final String? employerId;
+  final String? businessId;
 
   Employee({
     this.id,
@@ -20,7 +20,7 @@ class Employee {
     required this.isDeleted,
     required this.email,
     required this.number,
-    this.employerId,
+    this.businessId,
   });
 
   Map<String, dynamic> toJson() {
@@ -33,7 +33,7 @@ class Employee {
       'is_deleted': isDeleted,
       'email': email,
       'number': number,
-      'employer_id': employerId,
+      'business_id': businessId,
     };
 
     if (id != null) {
@@ -63,12 +63,12 @@ class Employee {
       isDeleted: json['is_deleted'],
       email: json['email'],
       number: json['number'],
-      employerId: json['employer_id'],
+      businessId: json['business_id'],
     );
   }
 
   @override
   String toString() {
-    return 'Employee { id: $id, firstName: $firstName, lastName: $lastName, email: $email, number: $number, daysPerWeek: $daysPerWeek, isAdmin: $isAdmin, isDeleted: $isDeleted, availability: $availability, employerId: $employerId }';
+    return 'Employee { id: $id, firstName: $firstName, lastName: $lastName, email: $email, number: $number, daysPerWeek: $daysPerWeek, isAdmin: $isAdmin, isDeleted: $isDeleted, availability: $availability, businessId: $businessId }';
   }
 }

@@ -5,6 +5,7 @@ import 'package:my_app/constants.dart';
 import 'package:my_app/controllers/MenuAppController.dart';
 import 'package:my_app/responsive.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:my_app/services/user_auth_service.dart';
 import 'package:provider/provider.dart';
 
 class Header extends StatelessWidget {
@@ -32,8 +33,8 @@ class Header extends StatelessWidget {
                 .titleLarge!
                 .copyWith(color: primaryTextColour),
           ),
-        if (!Responsive.isMobile(context))
-          Spacer(flex: Responsive.isDesktop(context) ? 2 : 1),
+        //if (!Responsive.isMobile(context)) //removed as shrinking header on movbil small
+        Spacer(flex: Responsive.isDesktop(context) ? 2 : 1),
         const ProfileCard()
       ],
     );
@@ -47,6 +48,7 @@ class ProfileCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final displayName = Provider.of<UserAuthProvider>(context).displayName;
     return Container(
       margin: const EdgeInsets.only(left: defaultPadding),
       padding: const EdgeInsets.symmetric(
@@ -60,18 +62,13 @@ class ProfileCard extends StatelessWidget {
       ),
       child: Row(
         children: [
-          const Text(
-            "A J",
-            style: TextStyle(color: Colors.white),
-          ),
-          if (!Responsive.isMobile(context))
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: defaultPadding / 2),
-              child: Text(
-                "Angelina Jolie",
-                style: TextStyle(color: Colors.white),
-              ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: defaultPadding / 2),
+            child: Text(
+              displayName ?? "Hello!", //default while user is loading
+              style: const TextStyle(color: Colors.white),
             ),
+          ),
           PopupMenuButton(
             icon: const Icon(Icons.keyboard_arrow_down, color: Colors.white),
             itemBuilder: (BuildContext context) => [

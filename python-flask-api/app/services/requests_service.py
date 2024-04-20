@@ -55,6 +55,7 @@ def get_all_requests(user_id):
             request_data = doc.to_dict()
             if not request_data.get('is_deleted', False):
                 request_object = TimeOffRequest(**request_data)
+                request_object.request_id = doc.id
                 if user_type == 'business' or (user_type == 'employee' and request_object.employee_id == employee_id):
                     requests.append(request_object)
 

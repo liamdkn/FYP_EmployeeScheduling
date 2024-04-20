@@ -8,19 +8,25 @@ import '../../../services/employee_service.dart';
 
 class EditEmployee extends StatefulWidget {
   final Employee employee;
+  final Function() onUpdate;
+  final bool isBusinessUser;
 
-  const EditEmployee({Key? key, required this.employee}) : super(key: key);
+  const EditEmployee({
+    Key? key,
+    required this.employee,
+    required this.onUpdate,
+    required this.isBusinessUser,
+  }) : super(key: key);
 
   @override
   _EditEmployeeState createState() => _EditEmployeeState();
 }
 
 class _EditEmployeeState extends State<EditEmployee> {
-  final _formKey = GlobalKey<FormBuilderState>();
-
+  final GlobalKey<FormBuilderState> _formKeyEditEmployee =
+      GlobalKey<FormBuilderState>();
   late Employee _editedEmployee;
   late Map<String, Map<String, String>> _editedAvailability;
-
   final EmployeeService _employeeService = EmployeeService();
 
   @override
@@ -48,30 +54,38 @@ class _EditEmployeeState extends State<EditEmployee> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
+                  if (widget.isBusinessUser)
+                    CustomElevatedButton(
+                      text: 'Delete',
+                      onPressed: () async {
+                        try {
+                          await _employeeService
+                              .deleteEmployee(_editedEmployee.id!);
+                          widget.onUpdate();
+                          Navigator.pop(context);
+                        } catch (error) {
+                          print('Error deleting employee: $error');
+                        }
+                      },
+                      color: Colors.red,
+                    ),
                   CustomElevatedButton(
-                    text: 'Delete',
+                    text: widget.isBusinessUser
+                        ? 'Save Changes'
+                        : 'Update Profile',
                     onPressed: () async {
-                      try {
-                        await _employeeService
-                            .deleteEmployee(_editedEmployee.id!);
-                      } catch (error) {
-                        print('Error deleting employee: $error');
-                      }
-                    },
-                    color: Colors.red,
-                  ),
-                  CustomElevatedButton(
-                    text: 'Save Changes',
-                    onPressed: () async {
-                      if (_formKey.currentState!.saveAndValidate()) {
+                      if (_formKeyEditEmployee.currentState!
+                          .saveAndValidate()) {
                         Map<String, dynamic> updatedData = {
-                          ..._formKey.currentState!.value,
+                          ..._formKeyEditEmployee.currentState!.value,
+                          'days_per_week': int.parse(_formKeyEditEmployee
+                              .currentState!.value['days_per_week']),
                           'availability': _editedAvailability,
                         };
-                        // employee object with edited data
-                        //_editedEmployee = _editedEmployee.copyWith(updatedData);
                         try {
-                          // await _employeeService.updateEmployee(_editedEmployee);
+                          await _employeeService.editEmployee(
+                              _editedEmployee.id!, updatedData);
+                          widget.onUpdate();
                         } catch (error) {
                           print('Error updating employee: $error');
                         }
@@ -89,7 +103,7 @@ class _EditEmployeeState extends State<EditEmployee> {
 
   Widget _buildEditEmployeeForm() {
     return FormBuilder(
-      key: _formKey,
+      key: _formKeyEditEmployee,
       initialValue: _editedEmployee.toJson()
         ..['days_per_week'] = _editedEmployee.daysPerWeek.toString(),
       autovalidateMode: AutovalidateMode.disabled,

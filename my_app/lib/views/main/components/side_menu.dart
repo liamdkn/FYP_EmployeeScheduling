@@ -1,18 +1,25 @@
+import 'dart:js';
+
 import 'package:flutter/material.dart';
-import 'package:my_app/views/rosters/roster_screen.dart';
+import 'package:my_app/services/user_auth_service.dart';
+import 'package:provider/provider.dart';
 
 class SideMenu extends StatelessWidget {
   final int selectedIndex;
   final Function(int) onItemSelected;
+  //final String? userType;
 
   const SideMenu({
-    Key? key,
+    super.key,
     required this.selectedIndex,
     required this.onItemSelected,
-  }) : super(key: key);
+    //required this.userType,
+  });
 
   @override
   Widget build(BuildContext context) {
+    String? userType = Provider.of<UserAuthProvider>(context).userType;
+
     return Drawer(
       child: ListView(
         children: [
@@ -33,20 +40,22 @@ class SideMenu extends StatelessWidget {
               onItemSelected(1);
             },
           ),
-          DrawerListTile(
-            title: "Generate Roster",
-            icon: Icons.receipt_long_outlined,
-            press: () {
-              onItemSelected(2);
-            },
-          ),
-          DrawerListTile(
-            title: "Employees",
-            icon: Icons.people,
-            press: () {
-              onItemSelected(3);
-            },
-          ),
+          if (userType == 'business')
+            DrawerListTile(
+              title: "Generate Roster",
+              icon: Icons.receipt_long_outlined,
+              press: () {
+                onItemSelected(2);
+              },
+            ),
+          if (userType == 'business')
+            DrawerListTile(
+              title: "Employees",
+              icon: Icons.people,
+              press: () {
+                onItemSelected(3);
+              },
+            ),
           DrawerListTile(
             title: "Requests",
             icon: Icons.three_p,
@@ -54,13 +63,14 @@ class SideMenu extends StatelessWidget {
               onItemSelected(4);
             },
           ),
-          DrawerListTile(
-            title: "Profile",
-            icon: Icons.person,
-            press: () {
-              onItemSelected(5);
-            },
-          ),
+          if (userType == 'employee')
+            DrawerListTile(
+              title: "Profile",
+              icon: Icons.person,
+              press: () {
+                onItemSelected(5);
+              },
+            ),
         ],
       ),
     );
@@ -69,11 +79,11 @@ class SideMenu extends StatelessWidget {
 
 class DrawerListTile extends StatelessWidget {
   const DrawerListTile({
-    Key? key,
+    super.key,
     required this.title,
     required this.icon,
     required this.press,
-  }) : super(key: key);
+  });
 
   final String title;
   final IconData icon;

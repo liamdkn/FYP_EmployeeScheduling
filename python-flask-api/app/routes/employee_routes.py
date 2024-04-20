@@ -41,7 +41,7 @@ def delete_employee_route(employee_id):
         return jsonify({'error': response_data['error']}), 500
 
 
-@employee_blueprint.route('/employees/<string:employee_id>', methods=['PUT'])
+@employee_blueprint.route('/employees/edit/<string:employee_id>', methods=['PUT'])
 def edit_employee_route(employee_id):
     try:
         print("trying")

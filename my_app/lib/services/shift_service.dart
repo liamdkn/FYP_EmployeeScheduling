@@ -1,9 +1,10 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:my_app/constants.dart';
 import 'package:my_app/models/shift_model.dart';
 
 class ShiftService {
-  static const String shiftsURI = "http://127.0.0.1:5000/shifts";
+  static const String shiftsEndpoint = "/shifts";
 
   Future<String> createShifts(List<IndividualShift> shifts) async {
     try {
@@ -11,7 +12,7 @@ class ShiftService {
           shifts.map((shift) => shift.toJson()).toList();
 
       final response = await http.post(
-        Uri.parse(shiftsURI),
+        Uri.parse('$APIURI$shiftsEndpoint'),
         body: jsonEncode(shiftsJsonList),
         headers: {'Content-Type': 'application/json'},
       );

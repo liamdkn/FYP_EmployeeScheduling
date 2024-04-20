@@ -1,7 +1,9 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:my_app/constants.dart';
 import 'package:my_app/models/employee_model.dart';
+import 'package:my_app/services/user_auth_service.dart';
 import 'package:my_app/views/main/components/custom_elevated_button.dart';
 import 'package:my_app/views/main/components/custom_formbuilder_text_field.dart';
 import '../../../services/employee_service.dart';
@@ -14,11 +16,13 @@ class RegisterEmployee extends StatefulWidget {
 }
 
 class _RegisterEmployeeState extends State<RegisterEmployee> {
-  final _formKey = GlobalKey<FormBuilderState>();
+  final _formKeyRegisterEmployee = GlobalKey<FormBuilderState>();
+  bool isSigningUp = false; // Define isSigningUp state
 
   Map<String, Map<String, String>> availability = {};
 
   final EmployeeService _employeeService = EmployeeService();
+  final UserAuthProvider _authProvider = UserAuthProvider();
 
   @override
   Widget build(BuildContext context) {
@@ -37,33 +41,8 @@ class _RegisterEmployeeState extends State<RegisterEmployee> {
               const SizedBox(height: defaultPadding),
               CustomElevatedButton(
                 text: 'Submit',
-                onPressed: () async {
-                  if (_formKey.currentState!.saveAndValidate()) {
-                    try {
-                      Employee employee = Employee(
-                        firstName: _formKey.currentState!.value['firstname'],
-                        lastName: _formKey.currentState!.value['lastname'],
-                        daysPerWeek: int.parse(
-                            _formKey.currentState!.value['days_per_week']),
-                        availability: availability.map((key, value) =>
-                            MapEntry(key, value.cast<String, String>())),
-                        isAdmin: false,
-                        isDeleted: false,
-                        email: _formKey.currentState!.value['email'],
-                        number: _formKey.currentState!.value['number'],
-                        id: null,
-                      );
-
-                      await _employeeService.createEmployee(employee);
-
-                      _formKey.currentState?.reset();
-                      setState(() {
-                        availability.clear();
-                      });
-                    } catch (error) {
-                      print('Error adding employee: $error');
-                    }
-                  }
+                onPressed: () {
+                  _registerEmployee();
                 },
               ),
             ],
@@ -75,7 +54,7 @@ class _RegisterEmployeeState extends State<RegisterEmployee> {
 
   Widget _buildCreateEmployeeForm() {
     return FormBuilder(
-      key: _formKey,
+      key: _formKeyRegisterEmployee,
       autovalidateMode: AutovalidateMode.disabled,
       child: const Column(
         children: [
@@ -113,6 +92,16 @@ class _RegisterEmployeeState extends State<RegisterEmployee> {
               child: CustomFormBuilderTextField(
                 name: "number",
                 hintText: "0876543210",
+              ),
+            ),
+          ]),
+          SizedBox(height: defaultPadding),
+          Row(children: [
+            Text("Password: "),
+            Expanded(
+              child: CustomFormBuilderTextField(
+                name: "password",
+                hintText: "Enter your password",
               ),
             ),
           ]),
@@ -227,4 +216,82 @@ class _RegisterEmployeeState extends State<RegisterEmployee> {
     }
     return intervals;
   }
+
+  Future<void> _registerEmployee() async {
+    if (_formKeyRegisterEmployee.currentState!.saveAndValidate()) {
+      setState(() {
+        isSigningUp = true;
+      });
+
+      var formData = _formKeyRegisterEmployee.currentState!.value;
+      String firstName = formData['firstname'];
+      String lastName = formData['lastname'];
+      String email = formData['email'];
+      String phoneNumber = formData['number'];
+      String password = formData['password'];
+      String daysPerWeek = formData['days_per_week'];
+
+      try {
+        // Create Firebase user and obtain user ID
+        String userId = await _authProvider.createFirebaseDBUser(
+            email, password, firstName);
+
+        // Create employee object with obtained user ID
+        Employee employee = Employee(
+          firstName: firstName,
+          lastName: lastName,
+          daysPerWeek: int.parse(daysPerWeek),
+          availability: availability
+              .map((key, value) => MapEntry(key, value.cast<String, String>())),
+          isAdmin: false,
+          isDeleted: false,
+          email: email,
+          number: phoneNumber,
+          businessId: buisnessID,
+          id: userId, // Assign Firebase user ID as employee ID
+        );
+
+        // Call employee service to create employee
+        await _employeeService.createEmployee(employee);
+
+        // Reset form and availability
+        _formKeyRegisterEmployee.currentState?.reset();
+        setState(() {
+          availability.clear();
+        });
+      } catch (error) {
+        print('Error adding employee: $error');
+      } finally {
+        setState(() {
+          isSigningUp = false;
+        });
+      }
+    }
+  }
+
+  /*Future<String> _createFireBaseUser(String email, String password) async {
+    setState(() {
+      isSigningUp = true;
+    });
+
+    try {
+      UserCredential userCredential =
+          await FirebaseAuth.instance.createUserWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
+
+      // Successfully created user, return user ID
+      String userId = userCredential.user!.uid;
+      print('User ID: $userId');
+      return userId;
+    } catch (error) {
+      print('Error creating Firebase user: $error');
+      rethrow; // Rethrow the error to be caught by the caller
+    } finally {
+      setState(() {
+        isSigningUp = false;
+      });
+    }
+  }*/
 }

@@ -8,7 +8,7 @@ import 'package:my_app/views/employees/components/employee_register_widget.dart'
 import 'package:my_app/views/main/components/custom_elevated_button.dart';
 import 'package:my_app/views/main/components/custom_formbuilder_text_field.dart';
 import 'package:my_app/views/main/components/custom_text_form_field.dart';
-import 'package:my_app/services/user_auth_services.dart';
+import 'package:my_app/services/user_auth_service.dart';
 import 'package:my_app/views/user_auth/user_login_page.dart';
 
 enum UserType { business, employee }
@@ -23,6 +23,7 @@ class SignUpPage extends StatefulWidget {
 class _SignUpPageState extends State<SignUpPage> {
   final _formKey = GlobalKey<FormBuilderState>();
   final BusinessService _businessService = BusinessService();
+  final UserAuthProvider _authProvider = UserAuthProvider();
   Map<String, Map<String, String>> availability = {};
 
   bool isSigningUp = false;
@@ -216,7 +217,8 @@ class _SignUpPageState extends State<SignUpPage> {
 
       try {
         // Create Firebase user and obtain user ID
-        String userId = await _createFireBaseUser(email, password);
+        String userId = await _authProvider.createFirebaseDBUser(
+            email, password, businessName);
 
         // Create business object with obtained user ID
         Business business = Business(
@@ -231,6 +233,7 @@ class _SignUpPageState extends State<SignUpPage> {
 
         // Call business service to create business and get the ID
         String businessId = await _businessService.createBusiness(business);
+        print("buisness created");
 
         // Reset form and navigate to login page
         _formKey.currentState?.reset();
@@ -247,31 +250,6 @@ class _SignUpPageState extends State<SignUpPage> {
           isSigningUp = false;
         });
       }
-    }
-  }
-
-  Future<String> _createFireBaseUser(String email, String password) async {
-    setState(() {
-      isSigningUp = true;
-    });
-
-    try {
-      UserCredential userCredential =
-          await FirebaseAuth.instance.createUserWithEmailAndPassword(
-        email: email,
-        password: password,
-      );
-
-      String userId = userCredential.user!.uid;
-      print('User ID: $userId');
-      return userId;
-    } catch (error) {
-      print('Error creating Firebase user: $error');
-      rethrow;
-    } finally {
-      setState(() {
-        isSigningUp = false;
-      });
     }
   }
 }
