@@ -150,10 +150,12 @@ def mutate_population(population, employees, mutation_rate):
     return mutated_population
 
 
+
 def algorithm(next_generation, individual_shifts, employees, num_selection, population_size, approvedRequests, max_generations):
     generations = 0
     winner = next_generation
     conflicts = winner[0]['conflicts']  # Initialize conflicts here
+    mutation_rate = INITIAL_MUTATION_RATE
 
     while conflicts > 0 and generations < max_generations:  
         generations += 1
@@ -168,7 +170,8 @@ def algorithm(next_generation, individual_shifts, employees, num_selection, popu
 
         next_generation = [individual for individual in next_generation if individual['fitness'] is not None]
 
-        next_generation = mutate_population(next_generation, employees, MUTATION_RATE)
+        mutation_rate *= MUTATION_RATE_INCREMENT_FACTOR  # Increase mutation rate
+        next_generation = mutate_population(next_generation, employees, mutation_rate)
         # Sort the next generation based on fitness
         next_generation = sorted(next_generation, key=lambda x: x['fitness'], reverse=True)
         
@@ -180,6 +183,7 @@ def algorithm(next_generation, individual_shifts, employees, num_selection, popu
         print("Generation: ", generations)
     print("conflicts")
     return winner, generations, conflicts
+
 
 
 
@@ -208,25 +212,30 @@ def assign_shifts(chromosome, individual_shifts, employees):
 
 
 
-def generate_roster(individual_shifts, employees, approvedRequests):
+def generate_roster(individual_shifts, employees, approvedRequests, max_attempts=5):
     days = DAYS_OF_WEEK
     num_selection = NUM_SELECTED
     population_size = len(individual_shifts)
     num_shifts = len(individual_shifts)
     max_generations = 150
 
-
-    for _ in range(5):  
-        initial_population = initialise_population(INITIAL_POPUL_COUNT, employees, num_shifts)
-        population_with_fitness = calculate_inital_fitness(initial_population, individual_shifts, employees, approvedRequests)
-        chromosome, generations, conflicts = algorithm(population_with_fitness, individual_shifts, employees, num_selection, population_size, approvedRequests, max_generations)
-        if generations < max_generations:
-            break
-        print(f"Restarting roster generation, last attempt reached {generations} generations.")
-
-    assigned_shifts = assign_shifts(chromosome['chromosome'], individual_shifts, employees)
-    print(f"Final chromosome: {chromosome}, Generations: {generations}, Conflicts: {chromosome['conflicts']}, Fitness: {chromosome['fitness']}")
+    for attempt in range(max_attempts):  
+        try:
+            initial_population = initialise_population(INITIAL_POPUL_COUNT, employees, num_shifts)
+            population_with_fitness = calculate_inital_fitness(initial_population, individual_shifts, employees, approvedRequests)
+            chromosome, generations, conflicts = algorithm(population_with_fitness, individual_shifts, employees, num_selection, population_size, approvedRequests, max_generations)
+            if generations < max_generations:
+                assigned_shifts = assign_shifts(chromosome['chromosome'], individual_shifts, employees)
+                print(f"Final chromosome: {chromosome}, Generations: {generations}, Conflicts: {chromosome['conflicts']}, Fitness: {chromosome['fitness']}")
+                print("DEBUG: Roster generation script complete")
+                return assigned_shifts, generations, chromosome['conflicts'], chromosome['fitness']
+            else:
+                print(f"Attempt {attempt+1} reached {generations} generations. Retrying...")
+        except TypeError as e:
+            print(f"Error occurred: {e}. Retrying...")
+            continue
     
-    print("DEBUG: Roster generation script complete")
-    return assigned_shifts, generations, chromosome['conflicts'], chromosome['fitness']
+    raise RuntimeError("Failed to generate roster after multiple attempts. Please try again later.")
+
+
 
