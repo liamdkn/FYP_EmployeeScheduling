@@ -78,7 +78,7 @@ class _RequestsScreenState extends State<RequestsScreen> {
                   onUpdate: () {
                     _updateRequestsList();
                   },
-                  userType: 'business',
+                  userType: userType,
                 ),
               ),
             ),
