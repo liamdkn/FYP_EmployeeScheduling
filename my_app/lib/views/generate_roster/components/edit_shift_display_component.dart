@@ -2,19 +2,43 @@ import 'package:flutter/material.dart';
 import 'package:my_app/constants.dart';
 import 'package:my_app/models/employee_model.dart';
 import 'package:my_app/models/shift_model.dart';
-import 'package:my_app/responsive.dart';
+import 'package:my_app/services/employee_service.dart';
 
-class EditShiftDisplayComponent extends StatelessWidget {
+class EditShiftDisplayComponent extends StatefulWidget {
   final IndividualShift shift;
   final List<Employee> employees;
-  final void Function(Employee)? onEmployeeChanged;
+  final void Function(IndividualShift)? onShiftChanged;
 
   const EditShiftDisplayComponent(
     this.shift,
     this.employees, {
     Key? key,
-    this.onEmployeeChanged,
+    this.onShiftChanged,
   }) : super(key: key);
+
+  @override
+  _EditShiftDisplayComponentState createState() =>
+      _EditShiftDisplayComponentState();
+}
+
+class _EditShiftDisplayComponentState extends State<EditShiftDisplayComponent> {
+  final EmployeeService employeeService = EmployeeService();
+  late Employee _selectedEmployee;
+  bool isAvailable = true; // true init as came from generation
+
+  @override
+  void initState() {
+    super.initState();
+    _selectedEmployee = widget.shift.employee!;
+  }
+
+  void checkEmployeeAvailability(IndividualShift shift) async {
+    bool available = await employeeService.checkAvailability(shift);
+    print(available);
+    setState(() {
+      isAvailable = available;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -23,27 +47,41 @@ class EditShiftDisplayComponent extends StatelessWidget {
       margin: const EdgeInsets.symmetric(vertical: 4.0),
       decoration: BoxDecoration(
         color: shiftBgColor,
-        border: Border.all(color: shiftBorderColor),
+        border: Border.all(
+          color: isAvailable ? Colors.green : Colors.red,
+          width: 2.0,
+        ), //border reflects if employee is not ava
         borderRadius: BorderRadius.circular(8.0),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(shift.name),
+          Text(widget.shift.name),
           const SizedBox(height: 4.0),
+          Text(widget.shift.id),
           Text(
-              "${shift.startTime.substring(0, 5)} - ${shift.endTime.substring(0, 5)}"),
-          if (employees.isNotEmpty)
+              "${widget.shift.startTime.substring(0, 5)} - ${widget.shift.endTime.substring(0, 5)}"),
+          if (widget.employees.isNotEmpty)
             DropdownButton<Employee>(
-              value: shift.employee, // Set the value to the selected employee
+              value: _selectedEmployee,
               onChanged: (Employee? newValue) {
-                if (onEmployeeChanged != null) {
-                  onEmployeeChanged!(newValue!);
+                if (newValue != null) {
+                  setState(() {
+                    _selectedEmployee = newValue;
+                    widget.shift.employee =
+                        newValue; // Update the shift's employee
+                  });
+                  if (widget.onShiftChanged != null) {
+                    widget
+                        .onShiftChanged!(widget.shift); // Return changed shift
+                    checkEmployeeAvailability(
+                        widget.shift); // Call availability check
+                  }
                 }
               },
               style: const TextStyle(color: Colors.black),
               dropdownColor: Colors.white,
-              items: employees
+              items: widget.employees
                   .map<DropdownMenuItem<Employee>>((Employee employee) {
                 return DropdownMenuItem<Employee>(
                   value: employee,

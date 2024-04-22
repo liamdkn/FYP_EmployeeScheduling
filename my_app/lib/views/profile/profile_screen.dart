@@ -2,11 +2,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:my_app/constants.dart';
 import 'package:my_app/models/employee_model.dart';
-import 'package:my_app/responsive.dart';
 import 'package:my_app/services/employee_service.dart';
 import 'package:my_app/views/employees/components/employee_edit_widget.dart';
 import 'package:my_app/views/main/components/header_widget.dart';
-import 'package:my_app/views/main/components/custom_elevated_button.dart';
 
 class ProfileScreen extends StatelessWidget {
   @override
@@ -15,7 +13,7 @@ class ProfileScreen extends StatelessWidget {
       future: _fetchEmployee(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return CircularProgressIndicator();
+          return const CircularProgressIndicator();
         } else if (snapshot.hasError) {
           return Text('Error: ${snapshot.error}');
         } else {
@@ -23,13 +21,13 @@ class ProfileScreen extends StatelessWidget {
           return SafeArea(
             child: SingleChildScrollView(
               primary: false,
-              padding: EdgeInsets.all(defaultPadding),
+              padding: const EdgeInsets.all(defaultPadding),
               child: Column(
                 children: [
-                  Header(
+                  const Header(
                     title: 'Profile',
                   ),
-                  SizedBox(height: defaultPadding),
+                  const SizedBox(height: defaultPadding),
                   Container(
                     height: 800,
                     child: EditEmployee(
@@ -38,7 +36,7 @@ class ProfileScreen extends StatelessWidget {
                       onUpdate: () {},
                     ),
                   ),
-                  SizedBox(height: defaultPadding),
+                  const SizedBox(height: defaultPadding),
                 ],
               ),
             ),

@@ -2,21 +2,52 @@ import 'package:flutter/material.dart';
 import 'package:my_app/constants.dart';
 import 'package:my_app/models/roster_model.dart';
 import 'package:my_app/models/shift_model.dart';
+import 'package:my_app/responsive.dart';
 import 'package:my_app/views/rosters/components/shift_display_component.dart';
 
 class RosterDisplayWidget extends StatelessWidget {
   final Roster roster;
 
-  RosterDisplayWidget(this.roster);
+  const RosterDisplayWidget(this.roster, {super.key});
 
   @override
   Widget build(BuildContext context) {
+    if (Responsive.isMobile(context)) {
+      return _buildMobileLayout();
+    } else {
+      return _buildDesktopLayout();
+    }
+  }
+
+  Widget _buildMobileLayout() {
     return Container(
-      padding: const EdgeInsets.all(16.0),
-      margin: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 16.0),
+      padding: const EdgeInsets.all(defaultPadding),
       decoration: BoxDecoration(
         color: bgColor,
-        border: Border.all(color: secondaryColor),
+        borderRadius: BorderRadius.circular(15.0),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.5),
+            spreadRadius: 5,
+            blurRadius: 7,
+            offset: const Offset(0, 3),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          _buildShiftsForAllDays(),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDesktopLayout() {
+    return Container(
+      padding: const EdgeInsets.all(defaultPadding),
+      decoration: BoxDecoration(
+        color: bgColor,
         borderRadius: BorderRadius.circular(15.0),
         boxShadow: [
           BoxShadow(
@@ -31,10 +62,10 @@ class RosterDisplayWidget extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Table(
-            border: TableBorder.all(color: secondaryColor),
+            border: TableBorder.all(color: rosterOutline),
             children: [
               TableRow(
-                decoration: const BoxDecoration(color: listHeaderColor),
+                decoration: const BoxDecoration(color: rosterHeader),
                 children: [
                   for (var day in daysOfWeek)
                     TableCell(
@@ -68,6 +99,29 @@ class RosterDisplayWidget extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildShiftsForAllDays() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: daysOfWeek
+          .map(
+            (day) => Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 8.0),
+                  child: Text(
+                    day,
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                ),
+                ..._buildShiftsForDay(roster, day),
+              ],
+            ),
+          )
+          .toList(),
     );
   }
 

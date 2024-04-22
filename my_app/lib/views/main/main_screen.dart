@@ -2,7 +2,6 @@
 
 import 'package:my_app/controllers/MenuAppController.dart';
 import 'package:my_app/responsive.dart';
-import 'package:my_app/services/user_auth_service.dart';
 import 'package:my_app/views/dashboard/dashboard_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:my_app/views/generate_roster/generate_roster_screen.dart';
@@ -38,8 +37,6 @@ class _MainScreenState extends State<MainScreen> {
 
   @override
   Widget build(BuildContext context) {
-    String? userType = Provider.of<UserAuthProvider>(context).userType;
-
     return Scaffold(
       key: _scaffoldKey,
       drawer: SideMenu(
@@ -74,11 +71,11 @@ class _MainScreenState extends State<MainScreen> {
       case 1:
         return RosterScreen();
       case 2:
-        return GenerateRosterScreen();
+        return const GenerateRosterScreen();
       case 3:
         return EmployeesScreen();
       case 4:
-        return RequestsScreen();
+        return const RequestsScreen();
       case 5:
         return ProfileScreen();
       default:

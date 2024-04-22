@@ -1,92 +1,76 @@
 import 'package:flutter/material.dart';
 import 'package:my_app/constants.dart';
-import 'package:my_app/responsive.dart';
+import 'package:my_app/models/roster_model.dart';
 import 'package:my_app/views/main/components/header_widget.dart';
-import 'package:my_app/services/roster_service.dart'; // Import your roster service class
+import 'package:my_app/services/roster_service.dart';
+import 'package:my_app/views/rosters/components/roster_display_widget.dart';
 
-class DashboardScreen extends StatelessWidget {
+class DashboardScreen extends StatefulWidget {
   @override
-  Widget build(BuildContext context) {
-    return const SafeArea(
-      child: SingleChildScrollView(
-        primary: false,
-        padding: EdgeInsets.all(defaultPadding),
-        child: Column(
-          children: [
-            Header(
-              title: 'Dashboard',
-            ),
-            SizedBox(height: defaultPadding), // Add some space below the header
-            // Rest of your content goes here...
-          ],
-        ),
-      ),
-    );
-  }
+  _DashboardScreenState createState() => _DashboardScreenState();
 }
 
+class _DashboardScreenState extends State<DashboardScreen> {
+  final RosterService _rosterService = RosterService();
+  late Future<Roster?> _rosterFuture;
 
-/*
-class DashboardScreen extends StatelessWidget {
-  final RosterService rosterService =
-      RosterService(); // Instantiate the roster service
+  @override
+  void initState() {
+    super.initState();
+    _rosterFuture = _fetchCurrentRoster();
+  }
+
+  Future<Roster?> _fetchCurrentRoster() async {
+    try {
+      final Roster roster = await _rosterService.fetchRoster(currentRoster);
+      return roster;
+    } catch (error) {
+      return null;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return SafeArea(
       child: SingleChildScrollView(
         primary: false,
-        padding: EdgeInsets.all(defaultPadding),
+        padding: const EdgeInsets.all(defaultPadding),
         child: Column(
           children: [
-            Header(
+            const Header(
               title: 'Dashboard',
             ),
-            SizedBox(height: defaultPadding),
-            FutureBuilder(
-              future: rosterService.fetchRoster(
-                  '8bEnrIOgFiVZi28ejjke'), // Pass the roster id here
-              builder: (BuildContext context, AsyncSnapshot snapshot) {
+            const SizedBox(
+              height: defaultPadding,
+            ),
+            const Text(
+              "Current Roster",
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 18,
+              ),
+            ),
+            const SizedBox(
+              height: 6,
+            ),
+            FutureBuilder<Roster?>(
+              future: _rosterFuture,
+              builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return CircularProgressIndicator();
+                  return const CircularProgressIndicator();
                 } else if (snapshot.hasError) {
-                  return Text('Error: ${snapshot.error}');
+                  return const Text('Create your first roster to see it here!');
+                } else if (snapshot.hasData) {
+                  return RosterDisplayWidget(snapshot.data!);
                 } else {
-                  return Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Expanded(
-                        flex: 5,
-                        child: Column(
-                          children: [
-                            Container(
-                              child: RosterDisplayWidget(snapshot
-                                  .data), // Pass the fetched roster to the widget
-                            ),
-                            SizedBox(height: defaultPadding),
-                            Text("Requests"),
-                            if (Responsive.isMobile(context))
-                              SizedBox(height: defaultPadding),
-                            if (Responsive.isMobile(context)) Text("Storage"),
-                          ],
-                        ),
-                      ),
-                      if (!Responsive.isMobile(context))
-                        SizedBox(width: defaultPadding),
-                      // On Mobile means if the screen is less than 850 we don't want to show it
-                      if (!Responsive.isMobile(context))
-                        Expanded(
-                          flex: 2,
-                          child: Text("Storage"),
-                        ),
-                    ],
-                  );
+                  return const Text('No roster data available');
                 }
               },
-            )
+            ),
+            // Add any other content here
           ],
         ),
       ),
     );
   }
-}*/
+}

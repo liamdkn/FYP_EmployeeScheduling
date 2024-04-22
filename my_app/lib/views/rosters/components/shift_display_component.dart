@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:my_app/constants.dart';
 import 'package:my_app/models/shift_model.dart';
 
 class ShiftDisplayComponent extends StatelessWidget {
   final IndividualShift shift;
 
-  ShiftDisplayComponent(this.shift, {super.key});
+  const ShiftDisplayComponent(this.shift, {super.key});
 
   @override
   Widget build(BuildContext context) {

@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:my_app/constants.dart';
 import 'package:my_app/models/employee_model.dart';
+import 'package:my_app/models/shift_model.dart';
 
 class EmployeeService {
   String employeesEndpoint = "/employees";
@@ -120,6 +121,41 @@ class EmployeeService {
       print('Error fetching employee name: $error');
       print('Stack trace: $stackTrace');
       return null;
+    }
+  }
+
+  Future<bool> checkAvailability(IndividualShift shift) async {
+    try {
+      Employee? employee = shift.employee;
+
+      if (employee != null) {
+        Map<String, dynamic> requestData = {
+          'employee': employee.toJson(),
+          'shift': shift.toJson(),
+        };
+
+        final response = await http.post(
+          Uri.parse('$APIURI/employees/avacheck'),
+          body: jsonEncode(requestData),
+          headers: {'Content-Type': 'application/json'},
+        );
+
+        if (response.statusCode == 200) {
+          Map<String, dynamic> data = jsonDecode(response.body);
+          bool isAvailable = data['is_available'];
+          return isAvailable;
+        } else {
+          print('Failed to check availability. Error: ${response.body}');
+          return false;
+        }
+      } else {
+        print('Employee not found in the shift');
+        return false;
+      }
+    } catch (error, stackTrace) {
+      print('Error checking availability: $error');
+      print('Stack trace: $stackTrace');
+      return false;
     }
   }
 }

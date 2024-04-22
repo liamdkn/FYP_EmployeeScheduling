@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:my_app/constants.dart';
 import 'package:my_app/models/roster_model.dart';
-import 'package:my_app/services/user_auth_service.dart';
 
 class RosterService {
   static const String rosterEndpoint = "/rosters";

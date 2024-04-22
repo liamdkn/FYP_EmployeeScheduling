@@ -172,7 +172,7 @@ class _EditEmployeeState extends State<EditEmployee> {
     List<String> dropdownOptions = generateHalfHourIntervals();
 
     return Container(
-      width: 350.0,
+      width: 365.0,
       margin: const EdgeInsets.symmetric(vertical: 4.0),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,

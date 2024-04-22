@@ -63,7 +63,7 @@ class _RosterScreenState extends State<RosterScreen> {
         child: Column(
           children: [
             const Header(
-              title: 'Roster',
+              title: 'Rosters',
             ),
             const SizedBox(height: defaultPadding),
             if (rosters.isEmpty)

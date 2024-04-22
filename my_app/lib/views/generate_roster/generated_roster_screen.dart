@@ -1,15 +1,26 @@
 import 'package:flutter/material.dart';
+import 'package:my_app/models/employee_model.dart';
 import 'package:my_app/models/roster_model.dart';
+import 'package:my_app/models/shift_model.dart';
 import 'package:my_app/services/roster_service.dart';
 import 'package:my_app/views/main/components/custom_elevated_button.dart';
-import 'package:my_app/views/rosters/components/roster_display_widget.dart';
+import 'package:my_app/views/generate_roster/components/generate_roster_display_widget.dart';
 
 class GeneratedRosterScreen extends StatelessWidget {
   final RosterService _rosterService = RosterService();
   final Roster roster;
+  final List<Employee> employees;
+
   late String rosterId;
 
-  GeneratedRosterScreen(this.roster, {super.key});
+  GeneratedRosterScreen(this.roster, this.employees, {super.key});
+
+  void onShiftChanged(IndividualShift shift) {
+    int index = roster.assignedShifts.indexWhere((s) => s.id == shift.id);
+    if (index != -1) {
+      roster.assignedShifts[index] = shift;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -23,13 +34,21 @@ class GeneratedRosterScreen extends StatelessWidget {
           },
         ),
       ),
-      body: Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            RosterDisplayWidget(roster),
-            const SizedBox(height: 20),
-            Row(
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Expanded(
+            child: SingleChildScrollView(
+              child: RosterDisplayWidget(
+                roster,
+                employees,
+                onShiftChanged: onShiftChanged,
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(20.0),
+            child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 CustomElevatedButton(
@@ -39,14 +58,11 @@ class GeneratedRosterScreen extends StatelessWidget {
                   },
                   textColor: Colors.white,
                 ),
+                const SizedBox(width: 20),
                 CustomElevatedButton(
                   text: "Export Roster",
                   onPressed: () {
-                    if (rosterId != null) {
-                      _rosterService.exportRoster(roster);
-                    } else {
-                      print("Please save the roster first.");
-                    }
+                    _rosterService.exportRoster(roster);
                   },
                   textColor: Colors.white,
                 ),
@@ -54,18 +70,14 @@ class GeneratedRosterScreen extends StatelessWidget {
                 CustomElevatedButton(
                   text: "Publish Roster",
                   onPressed: () {
-                    if (rosterId != null) {
-                      _rosterService.publishRoster(rosterId!);
-                    } else {
-                      print("Please save the roster first.");
-                    }
+                    _rosterService.publishRoster(rosterId);
                   },
                   textColor: Colors.white,
                 ),
               ],
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

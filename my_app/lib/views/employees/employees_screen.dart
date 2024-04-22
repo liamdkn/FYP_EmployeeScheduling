@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:my_app/models/employee_model.dart';
+import 'package:my_app/responsive.dart';
 import 'package:my_app/views/employees/components/employee_register_widget.dart';
 import 'package:my_app/views/main/components/custom_elevated_button.dart';
 import 'package:my_app/views/main/components/custom_bottom_screen.dart';
@@ -9,6 +10,8 @@ import 'package:my_app/views/employees/components/employees_data_table.dart';
 import '../../../constants.dart';
 
 class EmployeesScreen extends StatefulWidget {
+  const EmployeesScreen({super.key});
+
   @override
   _EmployeesScreenState createState() => _EmployeesScreenState();
 }
@@ -54,6 +57,7 @@ class _EmployeesScreenState extends State<EmployeesScreen> {
               title: 'Employees',
             ),
             const SizedBox(height: headerPadding),
+            //if (!Responsive.isMobile(context)) //dont show if mobile
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
@@ -66,7 +70,7 @@ class _EmployeesScreenState extends State<EmployeesScreen> {
                         customModalBottomSheet(
                           context: context,
                           height: 750.0,
-                          child: SizedBox(
+                          child: const SizedBox(
                             height: 750.0,
                             width: 700.0,
                             child: RegisterEmployee(),

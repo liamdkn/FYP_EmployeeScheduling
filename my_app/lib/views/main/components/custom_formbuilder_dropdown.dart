@@ -29,7 +29,7 @@ class CustomFormBuilderDropdown extends StatelessWidget {
         labelStyle: const TextStyle(color: primaryTextColour),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10.0),
-          borderSide: BorderSide(color: Colors.black, width: 2.0),
+          borderSide: const BorderSide(color: Colors.black, width: 2.0),
         ),
         filled: true,
         fillColor: formInputColour,
@@ -37,6 +37,7 @@ class CustomFormBuilderDropdown extends StatelessWidget {
       initialValue: initialValue,
       onChanged: onChanged,
       validator: validator,
+      dropdownColor: Colors.white,
       items: items.map((item) {
         return DropdownMenuItem(
           value: item,
@@ -46,7 +47,7 @@ class CustomFormBuilderDropdown extends StatelessWidget {
             alignment: Alignment.center,
             child: Text(
               item,
-              style: TextStyle(color: secondaryTextColour),
+              style: const TextStyle(color: primaryTextColour),
             ),
           ),
         );

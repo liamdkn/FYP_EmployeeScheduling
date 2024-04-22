@@ -1,10 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:my_app/constants.dart';
-import 'package:my_app/constants.dart';
 import 'package:my_app/controllers/MenuAppController.dart';
 import 'package:my_app/responsive.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:my_app/services/user_auth_service.dart';
 import 'package:provider/provider.dart';
 

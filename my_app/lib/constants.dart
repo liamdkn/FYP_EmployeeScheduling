@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
-//const String APIURI = 'https://fyp-employeescheduling.onrender.com';
-const String APIURI = 'http://127.0.0.1:5000//';
+// ignore: constant_identifier_names
+const String APIURI = 'https://fyp-employeescheduling.onrender.com';
+//const String APIURI = 'http://127.0.0.1:5000';
 
 const primaryColor = Color.fromARGB(255, 255, 0, 204);
 const secondaryColor = Color.fromRGBO(37, 35, 42, 1.0);
@@ -21,6 +22,9 @@ const Color shiftBgColor = Color.fromARGB(255, 167, 191, 236);
 const Color shiftBorderColor = Color.fromARGB(86, 98, 137, 215);
 
 const Color formInputColour = Color.fromRGBO(238, 238, 238, 1);
+
+const Color rosterHeader = Color.fromARGB(60, 122, 120, 127);
+const Color rosterOutline = Color.fromARGB(185, 122, 120, 127);
 
 const defaultPadding = 16.0;
 const headerPadding = 55.0;
@@ -49,6 +53,7 @@ const List<String> holidayRequestReasons = [
 ];
 
 const buisnessID = "CIhEwAyPzWXz8d9e9QexHTlLqTr2";
+const currentRoster = "YD6eJHf00YXEsHu3OZc0";
 
 List<String> generateHalfHourIntervals() {
   List<String> intervals = [];

@@ -9,7 +9,14 @@ import 'package:my_app/views/main/components/custom_formbuilder_dropdown.dart';
 import 'package:my_app/views/main/components/custom_formbuilder_text_field.dart';
 
 class TimeOffRequestForm extends StatefulWidget {
-  const TimeOffRequestForm({Key? key}) : super(key: key);
+  final String userId;
+  final VoidCallback onSubmit;
+
+  const TimeOffRequestForm({
+    Key? key,
+    required this.userId,
+    required this.onSubmit,
+  }) : super(key: key);
 
   @override
   _TimeOffRequestFormState createState() => _TimeOffRequestFormState();
@@ -22,26 +29,28 @@ class _TimeOffRequestFormState extends State<TimeOffRequestForm> {
 
   @override
   Widget build(BuildContext context) {
-    return FormBuilder(
-      key: _formKeyTimeOffRequest,
-      autovalidateMode: AutovalidateMode.onUserInteraction,
-      skipDisabled: true,
-      child: Column(
-        children: [
-          const Text(
-            "Time Off Request",
-            style: TextStyle(color: primaryTextColour),
-          ),
-          const SizedBox(height: defaultPadding),
-          _buildSubmitRequestForm(),
-          const SizedBox(height: defaultPadding),
-          _buildDateTimePickers(),
-          const SizedBox(height: defaultPadding * 2),
-          CustomElevatedButton(
-            onPressed: _submitForm,
-            text: 'Submit',
-          ),
-        ],
+    return SingleChildScrollView(
+      child: FormBuilder(
+        key: _formKeyTimeOffRequest,
+        autovalidateMode: AutovalidateMode.onUserInteraction,
+        skipDisabled: true,
+        child: Column(
+          children: [
+            const Text(
+              "Time Off Request",
+              style: TextStyle(color: primaryTextColour),
+            ),
+            const SizedBox(height: defaultPadding),
+            _buildSubmitRequestForm(),
+            const SizedBox(height: defaultPadding),
+            _buildDateTimePickers(),
+            const SizedBox(height: defaultPadding * 2),
+            CustomElevatedButton(
+              onPressed: _submitForm,
+              text: 'Submit',
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -57,7 +66,7 @@ class _TimeOffRequestFormState extends State<TimeOffRequestForm> {
           onChanged: (value) {},
         ),
         const SizedBox(height: 16),
-        CustomFormBuilderTextField(
+        const CustomFormBuilderTextField(
           name: 'reason',
           hintText: 'Reason',
         ),
@@ -140,7 +149,7 @@ class _TimeOffRequestFormState extends State<TimeOffRequestForm> {
       String endTime = DateFormat('HH:mm').format(endDateTime);
 
       TimeOffRequest employeeRequest = TimeOffRequest(
-        employeeId: "",
+        employeeId: widget.userId,
         startDate: startDate,
         endDate: endDate,
         startTime: startTime,
@@ -157,6 +166,9 @@ class _TimeOffRequestFormState extends State<TimeOffRequestForm> {
       _requestService.createTimeOffRequest(employeeRequest);
 
       _formKeyTimeOffRequest.currentState!.reset();
+
+      widget.onSubmit();
+      Navigator.pop(context);
     }
   }
 }

@@ -30,8 +30,8 @@ class _ShiftInputWidgetState extends State<ShiftInputWidget> {
   void initState() {
     super.initState();
     _nameController = TextEditingController();
-    _selectedStartTime = TimeOfDay(hour: 9, minute: 0);
-    _selectedEndTime = TimeOfDay(hour: 17, minute: 0);
+    _selectedStartTime = const TimeOfDay(hour: 9, minute: 0);
+    _selectedEndTime = const TimeOfDay(hour: 17, minute: 0);
     _selectedDaysOfWeek = List<bool>.filled(7, false);
   }
 
@@ -49,7 +49,7 @@ class _ShiftInputWidgetState extends State<ShiftInputWidget> {
         ),
         child: LayoutBuilder(
           builder: (context, constraints) {
-            if (constraints.maxWidth > 600) {
+            if (constraints.maxWidth > 650) {
               return _buildWideLayout();
             } else {
               return _buildNarrowLayout();
@@ -115,35 +115,39 @@ class _ShiftInputWidgetState extends State<ShiftInputWidget> {
   Widget _buildNarrowLayout() {
     return Padding(
       padding: const EdgeInsets.all(defaultPadding),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          CustomTextFormField(
-            label: 'shiftName',
-            placeholder: 'Enter shift name',
-            controller: _nameController,
-            width: 200,
+      child: Center(
+        child: Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              CustomTextFormField(
+                label: 'shiftName',
+                placeholder: 'Enter shift name',
+                controller: _nameController,
+                width: 200,
+              ),
+              const SizedBox(height: defaultPadding),
+              _buildTimePickerButton(
+                text: 'Start Time',
+                time: _selectedStartTime,
+                onPressed: _selectStartTime,
+              ),
+              const SizedBox(height: defaultPadding),
+              _buildTimePickerButton(
+                text: 'End Time',
+                time: _selectedEndTime,
+                onPressed: _selectEndTime,
+              ),
+              const SizedBox(height: defaultPadding),
+              _buildDayOfWeekCheckboxes(),
+              const SizedBox(height: defaultPadding),
+              CustomElevatedButton(
+                onPressed: _addIndividualShift,
+                text: "Add Shift",
+              )
+            ],
           ),
-          const SizedBox(height: defaultPadding),
-          _buildTimePickerButton(
-            text: 'Start Time',
-            time: _selectedStartTime,
-            onPressed: _selectStartTime,
-          ),
-          const SizedBox(height: defaultPadding),
-          _buildTimePickerButton(
-            text: 'End Time',
-            time: _selectedEndTime,
-            onPressed: _selectEndTime,
-          ),
-          const SizedBox(height: defaultPadding),
-          _buildDayOfWeekCheckboxes(),
-          const SizedBox(height: defaultPadding),
-          CustomElevatedButton(
-            onPressed: _addIndividualShift,
-            text: "Add Shift",
-          )
-        ],
+        ),
       ),
     );
   }
@@ -161,7 +165,7 @@ class _ShiftInputWidgetState extends State<ShiftInputWidget> {
 
   Widget _buildDayOfWeekCheckboxes() {
     return Container(
-      constraints: BoxConstraints(maxWidth: 200),
+      constraints: const BoxConstraints(maxWidth: 200),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: List.generate(daysOfWeek.length, (index) {
@@ -169,10 +173,10 @@ class _ShiftInputWidgetState extends State<ShiftInputWidget> {
           return Row(
             children: [
               Container(
-                margin: EdgeInsets.only(right: 16.0),
+                margin: const EdgeInsets.only(right: 16.0),
                 child: Text(day),
               ),
-              Spacer(),
+              const Spacer(),
               Checkbox(
                 value: _selectedDaysOfWeek[index],
                 onChanged: (value) {

@@ -1,4 +1,3 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:my_app/constants.dart';
@@ -268,30 +267,4 @@ class _RegisterEmployeeState extends State<RegisterEmployee> {
       }
     }
   }
-
-  /*Future<String> _createFireBaseUser(String email, String password) async {
-    setState(() {
-      isSigningUp = true;
-    });
-
-    try {
-      UserCredential userCredential =
-          await FirebaseAuth.instance.createUserWithEmailAndPassword(
-        email: email,
-        password: password,
-      );
-
-      // Successfully created user, return user ID
-      String userId = userCredential.user!.uid;
-      print('User ID: $userId');
-      return userId;
-    } catch (error) {
-      print('Error creating Firebase user: $error');
-      rethrow; // Rethrow the error to be caught by the caller
-    } finally {
-      setState(() {
-        isSigningUp = false;
-      });
-    }
-  }*/
 }

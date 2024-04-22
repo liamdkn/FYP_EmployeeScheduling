@@ -47,7 +47,6 @@ def emergencyRequest(request):
     email_emergency_request(BUSINESS_EMAIL, request)
 
 
-
 def get_all_requests(user_id):
     if is_user_employee(user_id):
         user_type = 'employee'

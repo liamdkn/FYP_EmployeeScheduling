@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:my_app/models/employee_model.dart';
 import 'package:my_app/models/roster_model.dart';
 import 'package:my_app/models/shift_model.dart';
 import 'package:my_app/responsive.dart';
+import 'package:my_app/services/employee_service.dart';
 import 'package:my_app/services/roster_service.dart';
 import 'package:my_app/services/shift_service.dart';
 import 'package:my_app/views/generate_roster/components/employee_select_widget.dart';
@@ -15,7 +17,7 @@ import 'package:my_app/views/main/components/custom_elevated_button.dart';
 import '../../../constants.dart';
 
 class GenerateRosterScreen extends StatefulWidget {
-  const GenerateRosterScreen({super.key});
+  const GenerateRosterScreen({Key? key}) : super(key: key);
 
   @override
   _GenerateRosterState createState() => _GenerateRosterState();
@@ -24,6 +26,7 @@ class GenerateRosterScreen extends StatefulWidget {
 class _GenerateRosterState extends State<GenerateRosterScreen> {
   ShiftService shiftService = ShiftService();
   RosterService rosterService = RosterService();
+  EmployeeService employeeService = EmployeeService();
 
   List<IndividualShift> shifts = [];
   List<String> employeeIds = [];
@@ -32,6 +35,8 @@ class _GenerateRosterState extends State<GenerateRosterScreen> {
   late String selectedWeekNumber = 'Week 1';
 
   late DateTime startDate = DateTime.now();
+
+  bool _isGenerating = false; //generation in progress gate
 
   void onStartDateSelected(DateTime date) {
     setState(() {
@@ -95,11 +100,30 @@ class _GenerateRosterState extends State<GenerateRosterScreen> {
                           Row(
                             children: [
                               Expanded(
-                                flex: 2,
+                                //flex: 2,
                                 child: EmployeeListWidget(
                                   onEmployeesSelected: _handleEmployeesSelected,
                                 ),
                               ),
+                            ],
+                          ),
+                        if (!Responsive.isMobile(context))
+                          const SizedBox(height: defaultPadding),
+                        if (!Responsive.isMobile(context))
+                          Stack(
+                            children: [
+                              CustomElevatedButton(
+                                onPressed: () => _createRoster(
+                                    _rosterNameController.text, startDate),
+                                text: 'Generate Roster',
+                              ),
+                              if (_isGenerating)
+                                const Positioned.fill(
+                                  child: LinearProgressIndicator(
+                                    valueColor: AlwaysStoppedAnimation<Color>(
+                                        Colors.blue),
+                                  ),
+                                ),
                             ],
                           ),
                       ],
@@ -117,11 +141,23 @@ class _GenerateRosterState extends State<GenerateRosterScreen> {
                 ],
               ),
               const SizedBox(height: defaultPadding),
-              CustomElevatedButton(
-                onPressed: () =>
-                    _createRoster(_rosterNameController.text, startDate),
-                text: 'Generate Roster',
-              ),
+              if (Responsive.isMobile(context))
+                Stack(
+                  children: [
+                    CustomElevatedButton(
+                      onPressed: () =>
+                          _createRoster(_rosterNameController.text, startDate),
+                      text: 'Generate Roster',
+                    ),
+                    if (_isGenerating)
+                      const Positioned.fill(
+                        child: LinearProgressIndicator(
+                          valueColor:
+                              AlwaysStoppedAnimation<Color>(Colors.blue),
+                        ),
+                      ),
+                  ],
+                ),
             ],
           ),
         ),
@@ -142,7 +178,12 @@ class _GenerateRosterState extends State<GenerateRosterScreen> {
   }
 
   void _createRoster(String rosterName, DateTime startDate) async {
+    setState(() {
+      _isGenerating = true;
+    });
+
     String formattedStartDate = DateFormat('dd-MM-yyyy').format(startDate);
+    List<Employee> employees = await employeeService.getEmployees();
     try {
       String shiftsId = await shiftService.createShifts(shifts);
       Roster roster = Roster(
@@ -164,19 +205,39 @@ class _GenerateRosterState extends State<GenerateRosterScreen> {
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => GeneratedRosterScreen(generatedRoster),
+          builder: (context) =>
+              GeneratedRosterScreen(generatedRoster, employees),
         ),
       );
     } catch (error) {
-      print('Error generating roster: $error');
+      //roster fail error message
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Text(
+              'Oh Dear :(',
+              style: TextStyle(color: Colors.white),
+            ),
+            content: const Text(
+              'An error occurred while generating the roster, Please make sure Shifts & Employees are correct and there is enough employees to cover the shifts',
+              style: TextStyle(color: Colors.white),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: const Text('OK'),
+              ),
+            ],
+          );
+        },
+      );
+    } finally {
+      setState(() {
+        _isGenerating = false;
+      });
     }
-  }
-
-  DateTime _getNextMonday(DateTime date) {
-    int daysUntilNextMonday = DateTime.monday - date.weekday;
-    if (daysUntilNextMonday <= 0) {
-      daysUntilNextMonday += 7;
-    }
-    return date.add(Duration(days: daysUntilNextMonday));
   }
 }

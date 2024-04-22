@@ -11,8 +11,8 @@ class RosterShiftsPreview extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.all(16.0),
-      margin: EdgeInsets.symmetric(vertical: 8.0, horizontal: 8.0),
+      padding: const EdgeInsets.all(16.0),
+      margin: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 8.0),
       decoration: BoxDecoration(
         color: bgColor,
         border: Border.all(color: secondaryColor),
@@ -22,7 +22,7 @@ class RosterShiftsPreview extends StatelessWidget {
             color: Colors.grey.withOpacity(0.5),
             spreadRadius: 5,
             blurRadius: 7,
-            offset: Offset(0, 3),
+            offset: const Offset(0, 3),
           ),
         ],
       ),
@@ -33,18 +33,18 @@ class RosterShiftsPreview extends StatelessWidget {
             border: TableBorder.all(color: secondaryColor),
             children: [
               TableRow(
-                decoration: BoxDecoration(color: listHeaderColor),
+                decoration: const BoxDecoration(color: listHeaderColor),
                 children: [
                   for (var day in daysOfWeek)
                     TableCell(
                       child: Padding(
-                        padding: EdgeInsets.symmetric(
+                        padding: const EdgeInsets.symmetric(
                           vertical: 8.0,
                           horizontal: 4.0,
                         ),
                         child: Text(
                           day,
-                          style: TextStyle(fontWeight: FontWeight.bold),
+                          style: const TextStyle(fontWeight: FontWeight.bold),
                         ),
                       ),
                     ),
@@ -74,7 +74,7 @@ class RosterShiftsPreview extends StatelessWidget {
     return shiftsForDay
         .map(
           (shift) => Container(
-            padding: EdgeInsets.all(8.0),
+            padding: const EdgeInsets.all(8.0),
             child: ShiftDisplayComponent(shift),
           ),
         )

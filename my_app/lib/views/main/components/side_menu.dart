@@ -1,7 +1,7 @@
-import 'dart:js';
-
 import 'package:flutter/material.dart';
 import 'package:my_app/services/user_auth_service.dart';
+import 'package:my_app/responsive.dart'; // Assuming you have a responsive.dart file
+
 import 'package:provider/provider.dart';
 
 class SideMenu extends StatelessWidget {
@@ -24,7 +24,14 @@ class SideMenu extends StatelessWidget {
       child: ListView(
         children: [
           const DrawerHeader(
-            child: Text("Roster Generator"),
+            child: Text(
+              "Roster",
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
           ),
           DrawerListTile(
             title: "Dashboard",
@@ -40,7 +47,7 @@ class SideMenu extends StatelessWidget {
               onItemSelected(1);
             },
           ),
-          if (userType == 'business')
+          if (userType == 'business' && !Responsive.isMobile(context))
             DrawerListTile(
               title: "Generate Roster",
               icon: Icons.receipt_long_outlined,

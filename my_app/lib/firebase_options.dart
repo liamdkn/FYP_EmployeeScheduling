@@ -62,24 +62,24 @@ class DefaultFirebaseOptions {
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyDsVUoBp5KYSZQzu90M0mFxrDEL85_XbyI',
-    appId: '1:929392117103:ios:033bba3fd5a421082c149a',
-    messagingSenderId: '929392117103',
-    projectId: 'rostergenerator-6bee3',
+    apiKey: 'AIzaSyDtEDeDHM7oqsQ9Nm86kiJqEI5LH4No5eo',
+    appId: '1:1088162351236:ios:4f3e5718e9a3dedab39ad1',
+    messagingSenderId: '1088162351236',
+    projectId: 'rostergenerator2',
     databaseURL:
         'https://rostergenerator-6bee3-default-rtdb.europe-west1.firebasedatabase.app',
-    storageBucket: 'rostergenerator-6bee3.appspot.com',
+    storageBucket: 'rostergenerator2.appspot.com',
     iosBundleId: 'com.example.myApp',
   );
 
   static const FirebaseOptions macos = FirebaseOptions(
-    apiKey: 'AIzaSyDsVUoBp5KYSZQzu90M0mFxrDEL85_XbyI',
-    appId: '1:929392117103:ios:0854a1696075214f2c149a',
-    messagingSenderId: '929392117103',
-    projectId: 'rostergenerator-6bee3',
+    apiKey: 'AIzaSyDtEDeDHM7oqsQ9Nm86kiJqEI5LH4No5eo',
+    appId: '1:1088162351236:ios:4f3e5718e9a3dedab39ad1',
+    messagingSenderId: '1088162351236',
+    projectId: 'rostergenerator2',
     databaseURL:
         'https://rostergenerator-6bee3-default-rtdb.europe-west1.firebasedatabase.app',
-    storageBucket: 'rostergenerator-6bee3.appspot.com',
-    iosBundleId: 'com.example.myApp.RunnerTests',
+    storageBucket: 'rostergenerator2.appspot.com',
+    iosBundleId: 'com.example.myApp',
   );
 }

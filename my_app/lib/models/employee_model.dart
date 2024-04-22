@@ -71,4 +71,25 @@ class Employee {
   String toString() {
     return 'Employee { id: $id, firstName: $firstName, lastName: $lastName, email: $email, number: $number, daysPerWeek: $daysPerWeek, isAdmin: $isAdmin, isDeleted: $isDeleted, availability: $availability, businessId: $businessId }';
   }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+
+    return other is Employee &&
+        other.firstName == firstName &&
+        other.lastName == lastName &&
+        other.daysPerWeek == daysPerWeek &&
+        other.businessId == businessId;
+  }
+
+  @override
+  int get hashCode {
+    return Object.hash(
+      firstName,
+      lastName,
+      daysPerWeek,
+      businessId,
+    );
+  }
 }

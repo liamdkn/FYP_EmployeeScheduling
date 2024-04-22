@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:my_app/models/employee_request_model.dart';
+import 'package:my_app/responsive.dart';
 import 'package:my_app/views/main/components/custom_bottom_screen.dart';
 import 'package:my_app/views/main/components/custom_list_container.dart';
 import 'package:my_app/views/requests/components/requests_edit_widget.dart';
@@ -7,9 +8,13 @@ import 'package:my_app/views/requests/components/requests_edit_widget.dart';
 class RequestListTable extends StatelessWidget {
   final List<TimeOffRequest> requests;
   final Function() onUpdate;
+  final String userType;
 
   const RequestListTable(
-      {Key? key, required this.requests, required this.onUpdate})
+      {Key? key,
+      required this.requests,
+      required this.onUpdate,
+      required this.userType})
       : super(key: key);
 
   @override
@@ -18,13 +23,17 @@ class RequestListTable extends StatelessWidget {
       scrollDirection: Axis.vertical,
       child: CustomListContainer(
         child: DataTable(
-          columns: const [
-            DataColumn(label: Text('Name')),
-            DataColumn(label: Text('Reason')),
-            DataColumn(label: Text('Start Date')),
-            DataColumn(label: Text('End Date')),
-            DataColumn(label: Text('Status')),
-            DataColumn(label: Text("")),
+          columns: [
+            if (!Responsive.isMobile(context))
+              const DataColumn(label: Text('Name')),
+            if (!Responsive.isMobile(context))
+              const DataColumn(label: Text('Reason')),
+            if (!Responsive.isMobile(context))
+              const DataColumn(label: Text('Start Date')),
+            if (!Responsive.isMobile(context))
+              const DataColumn(label: Text('End Date')),
+            const DataColumn(label: Text('Status')),
+            const DataColumn(label: Text(""))
           ],
           rows: requests.map((request) {
             Color statusColor;
@@ -43,16 +52,28 @@ class RequestListTable extends StatelessWidget {
             }
 
             return DataRow(cells: [
-              DataCell(Text(request.employeeId)),
-              DataCell(Text(request.requestType)),
-              DataCell(Text(request.startDate)),
-              DataCell(Text(request.endDate)),
-              DataCell(
-                Text(
-                  request.status,
-                  style: TextStyle(color: statusColor),
+              if (!Responsive.isMobile(context))
+                DataCell(Text(request.employeeId)),
+              if (!Responsive.isMobile(context))
+                DataCell(Text(request.requestType)),
+              if (!Responsive.isMobile(context))
+                DataCell(Text(request.startDate)),
+              if (!Responsive.isMobile(context))
+                DataCell(Text(request.endDate)),
+              if (!Responsive.isMobile(context))
+                DataCell(
+                  Text(
+                    request.status,
+                    style: TextStyle(color: statusColor),
+                  ),
                 ),
-              ),
+              if (Responsive.isMobile(context))
+                DataCell(
+                  Text(
+                    request.status,
+                    style: TextStyle(color: statusColor),
+                  ),
+                ),
               DataCell(
                 SizedBox(
                   width: 40,
@@ -62,8 +83,11 @@ class RequestListTable extends StatelessWidget {
                       customModalBottomSheet(
                         context: context,
                         height: 450.0,
-                        child:
-                            EditRequest(request: request, onUpdate: onUpdate),
+                        child: EditRequest(
+                          request: request,
+                          onUpdate: onUpdate,
+                          userType: userType,
+                        ),
                       );
                     },
                   ),

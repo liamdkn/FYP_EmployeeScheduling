@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 
 class Responsive extends StatelessWidget {
@@ -12,7 +11,6 @@ class Responsive extends StatelessWidget {
     this.tablet,
     required this.desktop,
   }) : super(key: key);
-
 
   static bool isMobile(BuildContext context) =>
       MediaQuery.of(context).size.width < 850;

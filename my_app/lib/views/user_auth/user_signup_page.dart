@@ -2,12 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:my_app/constants.dart';
 import 'package:my_app/models/business_model.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:my_app/services/business_service.dart';
 import 'package:my_app/views/employees/components/employee_register_widget.dart';
 import 'package:my_app/views/main/components/custom_elevated_button.dart';
 import 'package:my_app/views/main/components/custom_formbuilder_text_field.dart';
-import 'package:my_app/views/main/components/custom_text_form_field.dart';
 import 'package:my_app/services/user_auth_service.dart';
 import 'package:my_app/views/user_auth/user_login_page.dart';
 
@@ -43,25 +41,27 @@ class _SignUpPageState extends State<SignUpPage> {
               _buildUserTypeSelector(),
               const SizedBox(height: defaultPadding),
               if (userType == UserType.business) _buildBusinessForm(),
-              GestureDetector(
-                onTap: createBusiness,
-                child: Container(
-                  width: double.infinity,
-                  height: 45,
-                  decoration: BoxDecoration(
-                    color: Colors.blue,
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: Center(
-                    child: isSigningUp
-                        ? const CircularProgressIndicator(color: Colors.white)
-                        : const Text("Sign Up",
-                            style: TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold)),
+              if (userType == UserType.business) ...[
+                GestureDetector(
+                  onTap: createBusiness,
+                  child: Container(
+                    width: double.infinity,
+                    height: 45,
+                    decoration: BoxDecoration(
+                      color: Colors.blue,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Center(
+                      child: isSigningUp
+                          ? const CircularProgressIndicator(color: Colors.white)
+                          : const Text("Sign Up",
+                              style: TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold)),
+                    ),
                   ),
                 ),
-              ),
+              ],
               _buildLoginPrompt(context),
             ],
           ),
@@ -233,7 +233,6 @@ class _SignUpPageState extends State<SignUpPage> {
 
         // Call business service to create business and get the ID
         String businessId = await _businessService.createBusiness(business);
-        print("buisness created");
 
         // Reset form and navigate to login page
         _formKey.currentState?.reset();

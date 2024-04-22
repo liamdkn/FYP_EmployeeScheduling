@@ -7,11 +7,13 @@ import 'package:my_app/views/main/components/custom_elevated_button.dart';
 class EditRequest extends StatelessWidget {
   final TimeOffRequest request;
   final RequestService requestService = RequestService();
-  final Function() onUpdate; // Add onUpdate parameter
+  final Function() onUpdate;
+  final String userType;
 
   EditRequest({
     required this.request,
-    required this.onUpdate, // Pass the onUpdate callback as a parameter
+    required this.onUpdate,
+    required this.userType,
   });
 
   @override
@@ -36,58 +38,38 @@ class EditRequest extends StatelessWidget {
           Divider(),
           Text('Status: ${request.status}'),
           const SizedBox(height: defaultPadding * 2),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              SizedBox(
-                width: double.infinity,
-                child: CustomElevatedButton(
-                  onPressed: () {
-                    //_approveRequest(context, request.requestId!);
-                    requestService.approveTimeOffRequest(request.requestId!);
-                    onUpdate();
-                    Navigator.pop(context);
-                  },
-                  text: 'Approve',
-                  color: Colors.green,
-                ),
+          //approve and deny only for business users
+          if (userType == "business") ...[
+            SizedBox(
+              width: double.infinity,
+              child: CustomElevatedButton(
+                onPressed: () {
+                  //_approveRequest(context, request.requestId!);
+                  requestService.approveTimeOffRequest(request.requestId!);
+                  onUpdate();
+                  Navigator.pop(context);
+                },
+                text: 'Approve',
+                color: Colors.green,
               ),
-              const SizedBox(height: 16),
-              SizedBox(
-                width: double.infinity,
-                child: CustomElevatedButton(
-                  onPressed: () {
-                    //_denyRequest(context, request.requestId!);
-                    requestService.denyTimeOffRequest(request.requestId!);
-                    onUpdate();
-                    Navigator.pop(context);
-                  },
-                  text: 'Deny',
-                  color: Colors.red,
-                ),
+            ),
+            const SizedBox(height: 16),
+            SizedBox(
+              width: double.infinity,
+              child: CustomElevatedButton(
+                onPressed: () {
+                  //_denyRequest(context, request.requestId!);
+                  requestService.denyTimeOffRequest(request.requestId!);
+                  onUpdate();
+                  Navigator.pop(context);
+                },
+                text: 'Deny',
+                color: Colors.red,
               ),
-            ],
-          ),
+            ),
+          ],
         ],
       ),
     );
   }
-/*
-  void _approveRequest(BuildContext context, String requestId) async {
-    final currentContext = context;
-    try {
-      await requestService.approveTimeOffRequest(requestId);
-      onUpdate();
-      Navigator.pop(currentContext);
-    } catch (error) {}
-  }
-
-  void _denyRequest(BuildContext context, String requestId) async {
-    final currentContext = context;
-    try {
-      await requestService.denyTimeOffRequest(requestId);
-      onUpdate();
-      Navigator.pop(currentContext);
-    } catch (error) {}
-  }*/
 }

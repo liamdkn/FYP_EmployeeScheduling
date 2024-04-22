@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:my_app/models/employee_model.dart';
+import 'package:my_app/responsive.dart';
 import 'package:my_app/views/employees/components/employee_edit_widget.dart';
 import 'package:my_app/views/main/components/custom_bottom_screen.dart';
 import 'package:my_app/views/main/components/custom_list_container.dart';
@@ -19,19 +20,24 @@ class EmployeesDataTable extends StatelessWidget {
       scrollDirection: Axis.vertical,
       child: CustomListContainer(
         child: DataTable(
-          columns: const [
-            DataColumn(label: Text('Name')),
-            DataColumn(label: Text('Email')),
-            DataColumn(label: Text('Phone Num.')),
-            DataColumn(label: Text('Days Per Week')),
-            DataColumn(label: Text('')),
+          columns: [
+            const DataColumn(label: Text('Name')),
+            if (!Responsive.isMobile(context))
+              const DataColumn(label: Text('Email')),
+            if (!Responsive.isMobile(context))
+              const DataColumn(label: Text('Phone Num.')),
+            if (!Responsive.isMobile(context))
+              const DataColumn(label: Text('Days Per Week')),
+            const DataColumn(label: Text('')),
           ],
           rows: employees.map((employee) {
             return DataRow(cells: [
               DataCell(Text('${employee.firstName} ${employee.lastName}')),
-              DataCell(Text(employee.email)),
-              DataCell(Text(employee.number)),
-              DataCell(Text(employee.daysPerWeek.toString())),
+              if (!Responsive.isMobile(context)) DataCell(Text(employee.email)),
+              if (!Responsive.isMobile(context))
+                DataCell(Text(employee.number)),
+              if (!Responsive.isMobile(context))
+                DataCell(Text(employee.daysPerWeek.toString())),
               DataCell(
                 IconButton(
                   icon: viewIcon,
