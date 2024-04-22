@@ -6,8 +6,6 @@ from app.services.employee_service import get_employees
 from app.services.email_service import email_emergency_request
 from datetime import time
 from constants import *
-
-
 import traceback
 
 def create_request(request_data, user_id):
@@ -47,6 +45,7 @@ def emergencyRequest(request):
     print("Emergency request recieved with ID:", request.request_id)
 
     email_emergency_request(BUSINESS_EMAIL, request)
+
 
 
 def get_all_requests(user_id):
@@ -94,7 +93,10 @@ def get_approved_requests():
         return approved_requests
 
     except Exception as e:
-        return {"error": f"Error retrieving approved requests: {str(e)}"}
+        stack_trace = traceback.format_exc()
+        return {"error": f"Error retrieving approved requests: {str(e)}", "stack_trace": stack_trace}
+
+
 
 
 def approve_request(request_id):

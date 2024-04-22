@@ -10,6 +10,7 @@ import traceback
 import csv
 from collections import defaultdict
 import json
+from io import StringIO
 
 #getting rosters not generated roster 
 def get_roster(roster_id):
@@ -101,23 +102,20 @@ def soft_delete_roster(roster_id):
 
 
 def generate_roster_service(rosterData, shifts_id, employee_ids):
-    db = current_app.config['FIRESTORE_CLIENT']
-    generated_rosters_ref = db.collection('generated_rosters')
-
     try:
+        db = current_app.config['FIRESTORE_CLIENT']
+        generated_rosters_ref = db.collection('generated_rosters')
+
         employees = get_employees_by_id(employee_ids) 
         shifts = get_shifts_by_id(shifts_id)
         approvedRequests = get_approved_requests()
-        print(approvedRequests)
 
         assigned_shifts, generations, conflicts, fitness = generate_roster(shifts, employees, approvedRequests) 
 
-        print("Generations:", generations)
         for shift in assigned_shifts:
             print(f"Shift: {shift.name}, Day: {shift.day}, Start Time: {shift.start_time}, End Time: {shift.end_time}, Employee:{shift.employee.firstname}")
 
         new_roster = Roster(**rosterData)
-
         new_roster.assigned_shifts = assigned_shifts
         new_roster.fitness = fitness
         new_roster.conflicts = conflicts
@@ -132,10 +130,12 @@ def generate_roster_service(rosterData, shifts_id, employee_ids):
     except Exception as e:
         print(f"Error generating roster: {e}")
         traceback.print_exc()
+        return {"error": "An error occurred while generating the roster."}, 500
 
 
 
-def export_roster_weekly_view(roster_data):
+
+def export_roster_to_csv(roster_data):
     try:
         weekly_shifts = defaultdict(list)
         
@@ -145,23 +145,23 @@ def export_roster_weekly_view(roster_data):
             entry = f"{shift['employee']['firstname']} {shift['employee']['lastname']}, {shift['start_time']}-{shift['end_time']}"
             weekly_shifts[day].append(entry)
 
-        with open('weekly_roster_export.csv', 'w', newline='') as csvfile:
-            fieldnames = ['Day', 'Shift']
-            writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+        csv_content = StringIO()
+        fieldnames = ['Day', 'Shift']
+        writer = csv.DictWriter(csv_content, fieldnames=fieldnames)
+        writer.writeheader()
 
-            writer.writeheader()
+        for day, shifts in weekly_shifts.items():
+            for shift in shifts:
+                row = {'Day': day, 'Shift': shift}
+                writer.writerow(row)
 
-            for day, shifts in weekly_shifts.items():
-                for shift in shifts:
-                    row = {'Day': day, 'Shift': shift}
-                    writer.writerow(row)
-
-        print("Data has been written to weekly_roster_export.csv")
-        return True
+        print("Weekly roster exported successfully")
+        return csv_content.getvalue()
             
     except Exception as e:
         print("An error occurred during roster export:")
         traceback.print_exc()
+        return None
 
 
 
@@ -170,19 +170,22 @@ def publish_roster(roster_id):
     try:
         db = current_app.config['FIRESTORE_CLIENT']
         rosters_ref = db.collection('rosters')
-        roster_doc = rosters_ref.document(roster_id).get()  # Retrieve document snapshot
+        roster_doc = rosters_ref.document(roster_id).get()
 
         if roster_doc.exists:
             roster_data = roster_doc.to_dict()
             roster_data['is_published'] = True
             rosters_ref.document(roster_id).set(roster_data)
 
-            employee_emails = ['liamdurkan24@icloud.com']
-            attachment_data = '/Users/liamdurkan/Repositories/FYP_EmployeeScheduling/python-flask-api/weekly_roster_export.csv'
+            csv_content = export_roster_to_csv(roster_data)
 
-            email_roster_to_employees(employee_emails, attachment_data)
+            if csv_content:
+                employee_emails = BUSINESS_EMAIL
+                email_roster_to_employees(employee_emails, csv_content)
 
-            return {"message": "Roster published successfully"}, 200
+                return {"message": "Roster published successfully"}, 200
+            else:
+                return {"error": "Failed to export roster to CSV format"}, 500
         else:
             return {"error": "Roster not found"}, 404
 
@@ -190,3 +193,4 @@ def publish_roster(roster_id):
         traceback_str = traceback.format_exc()
         print(traceback_str)
         return {"error": f"Error publishing roster: {str(e)}"}, 500
+

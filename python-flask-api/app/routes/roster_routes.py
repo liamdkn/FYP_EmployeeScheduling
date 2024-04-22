@@ -32,8 +32,6 @@ def get_roster_by_id_route(roster_id):
         return jsonify({'error': 'Internal Server Error'}), 500
 
 
-
-
 @roster_blueprint.route('/rosters', methods=['POST'])
 def create_roster_route():
     try:
@@ -75,7 +73,10 @@ def soft_delete_roster_route(roster_id):
 def export_roster_route():
     try:
         roster_data = request.json
-        export_result = export_roster_weekly_view(roster_data)
+        export_result = export_roster_to_csv(roster_data)
+
+        if export_result:
+            email_exported_roster(export_result, BUSINESS_EMAIL)
         
         if export_result:
             return jsonify({'message': 'Roster exported successfully'}), 200

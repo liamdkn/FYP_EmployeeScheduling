@@ -1,5 +1,3 @@
-
-
 import json
 from flask import Flask
 from flask_cors import CORS
@@ -26,6 +24,7 @@ app.config['MAIL_PASSWORD'] = 'your_email_password'
 
 mail = Mail(app)
 
+#json_key_path = '/Users/liamdurkan/Repositories/FYP_EmployeeScheduling/python-flask-api/rostergenerator2-firebase-adminsdk-nu4ix-f5e7b904a7.json'
 json_key_path = '/etc/secrets/rostergenerator2-firebase-adminsdk-nu4ix-f5e7b904a7.json'
 cred = json.loads(open(json_key_path).read())
 
@@ -44,9 +43,14 @@ app.register_blueprint(request_blueprint)
 app.register_blueprint(business_blueprint)
 app.register_blueprint(user_blueprint)
 
+#if __name__ == '__main__':
+#   app.run(port=5000, debug=True)
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=False)
 
+
+#2 versions one for local one for deployment, inegrate to use env var with deployment to stop this
 '''
 import json
 from flask import Flask
@@ -74,7 +78,6 @@ app.config['MAIL_PASSWORD'] = 'your_email_password'
 
 mail = Mail(app)
 
-json_key_path = '/Users/liamdurkan/Repositories/FYP_EmployeeScheduling/python-flask-api/rostergenerator2-firebase-adminsdk-nu4ix-f5e7b904a7.json'
 cred = json.loads(open(json_key_path).read())
 
 @app.route('/')
@@ -93,5 +96,6 @@ app.register_blueprint(business_blueprint)
 app.register_blueprint(user_blueprint)
 
 if __name__ == '__main__':
-    app.run(port=5000, debug=True)
-    '''
+    app.run(host='0.0.0.0', port=5000, debug=False)
+
+'''

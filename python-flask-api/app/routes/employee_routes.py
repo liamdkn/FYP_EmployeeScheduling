@@ -1,6 +1,11 @@
 from flask import Blueprint, jsonify, request
 from flask_cors import CORS
-from app.services.employee_service import get_employee, get_employees, create_employee, soft_delete_employee, edit_employee
+from app.services.employee_service import *
+from app.services.requests_service import get_approved_requests
+from app.models.employee_model import Employee
+from app.models.shift_model import Ind_Shift
+
+
 
 employee_blueprint = Blueprint('employee', __name__)
 CORS(employee_blueprint)
@@ -44,7 +49,6 @@ def delete_employee_route(employee_id):
 @employee_blueprint.route('/employees/edit/<string:employee_id>', methods=['PUT'])
 def edit_employee_route(employee_id):
     try:
-        print("trying")
         employee_data = request.json
         response_data, status_code = edit_employee(employee_id, employee_data)
         return jsonify(response_data), status_code
@@ -52,6 +56,26 @@ def edit_employee_route(employee_id):
         return jsonify({'error': f'Error editing employee: {str(e)}'}), 500
 
 
+
+@employee_blueprint.route('/employees/avacheck', methods=['POST'])
+def employee_availability_check():
+    try:
+        request_data = request.json
+        employee = request_data.get('employee')
+        shift = request_data.get('shift')
+        approved_requests = get_approved_requests()
+
+        if employee and shift:
+            shift = Ind_Shift(**shift)
+            employee = Employee(**employee)
+            is_available = is_employee_available(employee, shift, approved_requests)
+            return jsonify({'is_available': is_available}), 200
+        else:
+            return jsonify({'error': 'Employee or shift data missing in the request'}), 400
+
+    except Exception as e:
+        traceback.print_exc()
+        return jsonify({'error': f'Error checking employee availability: {str(e)}'}), 500
 
 
 

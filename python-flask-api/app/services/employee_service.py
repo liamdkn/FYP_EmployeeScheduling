@@ -89,7 +89,6 @@ def get_employees_by_id(employee_ids):
 
 
 
-
 def soft_delete_employee(employee_id):
     try:
         db = current_app.config['FIRESTORE_CLIENT']
@@ -104,7 +103,6 @@ def soft_delete_employee(employee_id):
 
 
 
-from datetime import datetime, time
 
 def is_employee_available(employee, shift, approved_requests):
     try:
@@ -114,31 +112,35 @@ def is_employee_available(employee, shift, approved_requests):
         shift_date = datetime.strptime(shift.date, "%d-%m-%Y").date()
         shift_day = shift.day
 
-        # does shift overlaps with requests
+        # Check if shift overlaps with approved requests
         for request in approved_requests:
-            request_start_date = datetime.strptime(request.start_date, "%d-%m-%Y").date()
-            request_end_date = datetime.strptime(request.end_date, "%d-%m-%Y").date()
-            request_start_time = datetime.strptime(request.start_time, "%H:%M").time()
-            request_end_time = datetime.strptime(request.end_time, "%H:%M").time()
+            if request.employee_id == employee.id:  # Only consider requests for the current employee
+                request_start_date = datetime.strptime(request.start_date, "%d-%m-%Y").date()
+                request_end_date = datetime.strptime(request.end_date, "%d-%m-%Y").date()
+                request_start_time = datetime.strptime(request.start_time, "%H:%M").time()
+                request_end_time = datetime.strptime(request.end_time, "%H:%M").time()
 
-            request_start_datetime = datetime.combine(request_start_date, request_start_time)
-            request_end_datetime = datetime.combine(request_end_date, request_end_time)
-            shift_start_datetime = datetime.combine(shift_date, shift_start_time)
-            shift_end_datetime = datetime.combine(shift_date, shift_end_time)
+                request_start_datetime = datetime.combine(request_start_date, request_start_time)
+                request_end_datetime = datetime.combine(request_end_date, request_end_time)
+                shift_start_datetime = datetime.combine(shift_date, shift_start_time)
+                shift_end_datetime = datetime.combine(shift_date, shift_end_time)
 
-            if shift_overlap(shift_start_datetime, shift_end_datetime, request_start_datetime, request_end_datetime):
-                return False 
+                if shift_overlap(shift_start_datetime, shift_end_datetime, request_start_datetime, request_end_datetime):
+                    return False 
 
         if shift_day in availability:
             employee_availability = availability[shift_day]
             employee_start_time = datetime.strptime(employee_availability['start_time'], "%H:%M").time()
             employee_end_time = datetime.strptime(employee_availability['end_time'], "%H:%M").time()
 
+
             if (
                 employee_start_time <= shift_start_time <= employee_end_time
                 and employee_start_time <= shift_end_time <= employee_end_time
             ):
+                print("true")
                 return True 
+        print("false")
         return False 
     except Exception as e:
         traceback.print_exc()
