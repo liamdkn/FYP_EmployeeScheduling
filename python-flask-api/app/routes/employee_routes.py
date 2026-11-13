@@ -1,5 +1,4 @@
 from flask import Blueprint, jsonify, request
-from flask_cors import CORS
 from app.services.employee_service import *
 from app.services.requests_service import get_approved_requests
 from app.models.employee_model import Employee
@@ -8,7 +7,6 @@ from app.models.shift_model import Ind_Shift
 
 
 employee_blueprint = Blueprint('employee', __name__)
-CORS(employee_blueprint)
 
 @employee_blueprint.route('/employees', methods=['POST'])
 def create_employee_route():

@@ -1,9 +1,7 @@
 from flask import Blueprint, jsonify, request
-from flask_cors import CORS
 from app.services.business_service import *
 
 business_blueprint = Blueprint('business', __name__)
-CORS(business_blueprint)
 
 @business_blueprint.route('/business', methods=['POST'])
 def create_business_route():

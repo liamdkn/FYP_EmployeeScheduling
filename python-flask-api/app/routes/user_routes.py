@@ -1,10 +1,8 @@
 from flask import Blueprint, jsonify, request
-from flask_cors import CORS
 from app.services.employee_service import is_user_employee
 from app.services.business_service import is_user_business
 
 user_blueprint = Blueprint('user', __name__)
-CORS(user_blueprint)
 
 @user_blueprint.route('/user/<string:user_id>', methods=['GET'])
 def get_user_type(user_id):

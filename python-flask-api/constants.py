@@ -1,4 +1,4 @@
-# constants.py
+import os
 
 DAYS_OF_WEEK = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
 
@@ -19,4 +19,4 @@ NUM_SELECTED = 2
 INITIAL_MUTATION_RATE = 0.05
 MUTATION_RATE_INCREMENT_FACTOR = 1.2
 
-BUSINESS_EMAIL = 'liamdurkan24@icloud.com'
+BUSINESS_EMAIL = os.environ.get('BUSINESS_EMAIL', '')

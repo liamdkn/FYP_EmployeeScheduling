@@ -1,22 +1,10 @@
 import traceback
-from flask import Flask
-from flask_mail import Mail, Message
-import io
-import csv
-from flask_cors import CORS
+from flask import current_app
+from flask_mail import Message
 
-#
-app = Flask(__name__)
-CORS(app)
 
-app.config['MAIL_SERVER'] = 'bulk.smtp.mailtrap.io'
-app.config['MAIL_PORT'] = 587
-app.config['MAIL_USERNAME'] = 'api'
-app.config['MAIL_PASSWORD'] = '6175cc57efe5b7175456ee9442b3bb40'
-app.config['MAIL_USE_TLS'] = True
-app.config['MAIL_USE_SSL'] = False
-app.config['MAIL_DEFAULT_SENDER'] = 'mailtrap@demomailtrap.com'
-mail = Mail(app)
+def _send(message):
+    current_app.extensions['mail'].send(message)
 
 
 def email_roster_to_employees(employee_emails, export_data):
@@ -24,11 +12,11 @@ def email_roster_to_employees(employee_emails, export_data):
         subject = 'New Roster'
         body = 'Your employer has published a new roster'
 
-        msg = Message(subject, sender=app.config['MAIL_DEFAULT_SENDER'], recipients=[employee_emails])
+        msg = Message(subject, recipients=[employee_emails])
         msg.body = body
         msg.attach('roster.csv', 'text/csv', export_data)
 
-        mail.send(msg)
+        _send(msg)
 
         print("Roster published and sent to employees")
         return True
@@ -53,10 +41,10 @@ def email_emergency_request(business_email, request):
     body += f"Reason: {reason}"
 
     try:
-        msg = Message(subject, sender=app.config['MAIL_DEFAULT_SENDER'], recipients=[business_email])
+        msg = Message(subject, recipients=[business_email])
         msg.body = body
 
-        mail.send(msg)
+        _send(msg)
         print("Emergency Request Notice Sent To Employer")
     except Exception as e:
         print("An error occurred while sending the emergency request notice:")
@@ -69,11 +57,11 @@ def email_exported_roster(export_data, business_email):
         subject = 'Exported Roster'
         body = 'Attached is the exported roster CSV file.'
 
-        msg = Message(subject, sender=app.config['MAIL_DEFAULT_SENDER'], recipients=[business_email])
+        msg = Message(subject, recipients=[business_email])
         msg.body = body
         msg.attach('roster.csv', 'text/csv', export_data)
 
-        mail.send(msg)
+        _send(msg)
 
         print("Exported roster emailed to the business email.")
         return True

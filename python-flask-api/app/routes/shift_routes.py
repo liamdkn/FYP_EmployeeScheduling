@@ -1,10 +1,8 @@
 from flask import Blueprint, jsonify, request
-from flask_cors import CORS
 from app.services.shift_service import get_shifts, create_shifts
 import traceback 
 
 shift_blueprint = Blueprint('shift', __name__)
-CORS(shift_blueprint)
 
 @shift_blueprint.route('/shifts', methods=['POST'])
 def create_shifts_route():

@@ -1,10 +1,8 @@
 from flask import Blueprint, jsonify, request
-from flask_cors import CORS
 from app.services.requests_service import *
 import traceback 
 
 request_blueprint = Blueprint('requests', __name__)
-CORS(request_blueprint)
 
 @request_blueprint.route('/requests', methods=['POST'])
 def create_request_route():

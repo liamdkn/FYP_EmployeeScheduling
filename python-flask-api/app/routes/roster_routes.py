@@ -1,10 +1,8 @@
 from flask import Blueprint, jsonify, request
 import traceback
-from flask_cors import CORS
 from app.services.roster_service import *
 
 roster_blueprint = Blueprint('roster', __name__)
-CORS(roster_blueprint)
 
 @roster_blueprint.route('/rosters', methods=['GET'])
 def get_all_rosters_route():
