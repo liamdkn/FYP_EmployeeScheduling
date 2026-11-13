@@ -1,21 +1,24 @@
 from flask import Blueprint, jsonify, request
+from app.auth import require_auth, require_business
 from app.services.shift_service import get_shifts, create_shifts
 import traceback 
 
 shift_blueprint = Blueprint('shift', __name__)
 
 @shift_blueprint.route('/shifts', methods=['POST'])
+@require_business
 def create_shifts_route():
     try:
         shifts_data = request.json
         response_data = create_shifts(shifts_data)
         return jsonify({'shifts_id': response_data}), 201
-    except Exception as e:
+    except Exception:
         traceback.print_exc()
-        return jsonify({'error': str(e), 'stack_trace': traceback.format_exc()}), 400
+        return jsonify({'error': 'Invalid shift data'}), 400
 
 
 @shift_blueprint.route('/shifts', methods=['GET'])
+@require_auth
 def get_shifts_route():
     shifts = get_shifts()
     return jsonify(shifts)
