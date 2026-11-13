@@ -1,13 +1,15 @@
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, g, jsonify, request
+from app.auth import is_business_user, require_auth, require_business
 import traceback
 from app.services.roster_service import *
 
 roster_blueprint = Blueprint('roster', __name__)
 
 @roster_blueprint.route('/rosters', methods=['GET'])
+@require_auth
 def get_all_rosters_route():
     try:
-        user_type = request.headers.get('User-Type')
+        user_type = 'business' if is_business_user(g.user_id) else 'employee'
         rosters = get_all_rosters(user_type)
         return jsonify(rosters), 200 
     except Exception as e:
@@ -17,10 +19,13 @@ def get_all_rosters_route():
 
 
 @roster_blueprint.route('/rosters/<roster_id>', methods=['GET'])
+@require_auth
 def get_roster_by_id_route(roster_id):
     try:
         roster = get_roster(roster_id)
         if roster:
+            if not is_business_user(g.user_id) and not roster.get('is_published'):
+                return jsonify({'error': 'Roster not found'}), 404
             return roster, 200
         else:
             return jsonify({'error': 'Roster not found'}), 404
@@ -31,6 +36,7 @@ def get_roster_by_id_route(roster_id):
 
 
 @roster_blueprint.route('/rosters', methods=['POST'])
+@require_business
 def create_roster_route():
     try:
         roster_data = request.json    
@@ -56,6 +62,7 @@ def create_roster_route():
 
 
 @roster_blueprint.route('/rosters/<string:roster_id>', methods=['PUT'])
+@require_business
 def soft_delete_roster_route(roster_id):
     response_data, status_code = soft_delete_roster(roster_id)
     if status_code == 200:
@@ -68,6 +75,7 @@ def soft_delete_roster_route(roster_id):
 
 
 @roster_blueprint.route('/rosters/export', methods=['POST'])
+@require_business
 def export_roster_route():
     try:
         roster_data = request.json
@@ -89,6 +97,7 @@ def export_roster_route():
 
 
 @roster_blueprint.route('/rosters/save', methods=['POST'])
+@require_business
 def save_roster_route():
     try:
         roster_data = request.json
@@ -106,6 +115,7 @@ def save_roster_route():
 
 
 @roster_blueprint.route('/rosters/publish/<roster_id>', methods=['PUT'])
+@require_business
 def publish_roster_route(roster_id):
     print("trying to publishing roster")
     try:

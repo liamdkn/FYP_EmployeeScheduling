@@ -1,10 +1,12 @@
 from flask import Blueprint, jsonify, request
+from app.auth import require_auth, require_business
 from app.services.shift_service import get_shifts, create_shifts
 import traceback 
 
 shift_blueprint = Blueprint('shift', __name__)
 
 @shift_blueprint.route('/shifts', methods=['POST'])
+@require_business
 def create_shifts_route():
     try:
         shifts_data = request.json
@@ -16,6 +18,7 @@ def create_shifts_route():
 
 
 @shift_blueprint.route('/shifts', methods=['GET'])
+@require_auth
 def get_shifts_route():
     shifts = get_shifts()
     return jsonify(shifts)

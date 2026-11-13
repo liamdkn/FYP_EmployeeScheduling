@@ -2,10 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 // ignore: constant_identifier_names
-const String APIURI = String.fromEnvironment(
-  'API_BASE_URL',
-  defaultValue: 'http://127.0.0.1:5000',
-);
+const String APIURI = 'https://fyp-employeescheduling.onrender.com';
+//const String APIURI = 'http://127.0.0.1:5000';
 
 const primaryColor = Color.fromARGB(255, 255, 0, 204);
 const secondaryColor = Color.fromRGBO(37, 35, 42, 1.0);
