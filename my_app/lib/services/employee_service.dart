@@ -3,7 +3,6 @@ import 'package:http/http.dart' as http;
 import 'package:my_app/constants.dart';
 import 'package:my_app/models/employee_model.dart';
 import 'package:my_app/models/shift_model.dart';
-import 'package:my_app/services/api_headers.dart';
 
 class EmployeeService {
   String employeesEndpoint = "/employees";
@@ -14,7 +13,7 @@ class EmployeeService {
       final response = await http.post(
         Uri.parse('$APIURI$employeesEndpoint'),
         body: jsonEncode(employeeData),
-        headers: await authenticatedHeaders(json: true),
+        headers: {'Content-Type': 'application/json'},
       );
 
       if (response.statusCode == 201) {
@@ -31,10 +30,8 @@ class EmployeeService {
 
   Future<Employee?> getEmployeeById(String employeeId) async {
     try {
-      final response = await http.get(
-        Uri.parse('$APIURI$employeesEndpoint/$employeeId'),
-        headers: await authenticatedHeaders(),
-      );
+      final response =
+          await http.get(Uri.parse('$APIURI$employeesEndpoint/$employeeId'));
 
       if (response.statusCode == 200) {
         final Map<String, dynamic> jsonEmployee = json.decode(response.body);
@@ -57,10 +54,7 @@ class EmployeeService {
   }
 
   Future<List<Employee>> getEmployees() async {
-    final response = await http.get(
-      Uri.parse('$APIURI$employeesEndpoint'),
-      headers: await authenticatedHeaders(),
-    );
+    final response = await http.get(Uri.parse('$APIURI$employeesEndpoint'));
     print('Success Status Code: ${response.statusCode}');
 
     if (response.statusCode == 200) {
@@ -82,7 +76,7 @@ class EmployeeService {
     final response = await http.put(
       Uri.parse('$APIURI$employeesEndpoint/edit/$employeeId'),
       body: jsonEncode(employeeData),
-      headers: await authenticatedHeaders(json: true),
+      headers: {'Content-Type': 'application/json'},
     );
 
     if (response.statusCode == 200) {
@@ -95,7 +89,7 @@ class EmployeeService {
   Future<void> deleteEmployee(String employeeId) async {
     final response = await http.put(
       Uri.parse('$APIURI$employeesEndpoint/$employeeId'),
-      headers: await authenticatedHeaders(json: true),
+      headers: {'Content-Type': 'application/json'},
     );
 
     if (response.statusCode == 200) {
@@ -107,10 +101,8 @@ class EmployeeService {
 
   Future<String?> getEmployeeNameById(String employeeId) async {
     try {
-      final response = await http.get(
-        Uri.parse('$APIURI$employeesEndpoint/$employeeId'),
-        headers: await authenticatedHeaders(),
-      );
+      final response =
+          await http.get(Uri.parse('$APIURI$employeesEndpoint/$employeeId'));
 
       if (response.statusCode == 200) {
         final Map<String, dynamic> jsonEmployee = json.decode(response.body);
@@ -145,7 +137,7 @@ class EmployeeService {
         final response = await http.post(
           Uri.parse('$APIURI/employees/avacheck'),
           body: jsonEncode(requestData),
-          headers: await authenticatedHeaders(json: true),
+          headers: {'Content-Type': 'application/json'},
         );
 
         if (response.statusCode == 200) {

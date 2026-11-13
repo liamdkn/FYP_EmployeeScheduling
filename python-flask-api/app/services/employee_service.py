@@ -171,8 +171,7 @@ def edit_employee(employee_id, employee_data):
         return response_data, 200 
 
     except Exception as e:
-        print(f"Error editing employee: {e}")
-        return {"error": "Failed to edit employee"}, 500
+        return {"error": f"Error editing employee: {str(e)}"}, 500
 
 
 def is_user_employee(user_id):

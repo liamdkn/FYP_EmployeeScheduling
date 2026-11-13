@@ -1,6 +1,5 @@
 import os
 
-import firebase_admin
 from flask import Flask
 from flask_cors import CORS
 from google.cloud import firestore
@@ -15,13 +14,6 @@ from app.routes.user_routes import user_blueprint
 
 
 app = Flask(__name__)
-
-firebase_project = os.environ.get('GOOGLE_CLOUD_PROJECT')
-try:
-    firebase_admin.get_app()
-except ValueError:
-    options = {'projectId': firebase_project} if firebase_project else None
-    firebase_admin.initialize_app(options=options)
 
 cors_origins = [
     origin.strip()
@@ -52,7 +44,7 @@ def index():
 
 # Uses Application Default Credentials. For local development, set
 # GOOGLE_APPLICATION_CREDENTIALS to a service-account file stored outside Git.
-db = firestore.Client(project=firebase_project or None)
+db = firestore.Client(project=os.environ.get('GOOGLE_CLOUD_PROJECT') or None)
 app.config['FIRESTORE_CLIENT'] = db
 
 app.register_blueprint(employee_blueprint)

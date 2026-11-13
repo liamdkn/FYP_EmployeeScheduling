@@ -25,7 +25,7 @@ class EditRequest extends StatelessWidget {
         children: [
           Text(
             'Request Details',
-            style: Theme.of(context).textTheme.titleLarge,
+            style: Theme.of(context).textTheme.headline6,
           ),
           const SizedBox(height: defaultPadding),
           Text('Employee ID: ${request.employeeId}'),

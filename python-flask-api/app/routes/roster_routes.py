@@ -1,32 +1,26 @@
-from flask import Blueprint, g, jsonify, request
-from app.auth import is_business_user, require_auth, require_business
+from flask import Blueprint, jsonify, request
 import traceback
 from app.services.roster_service import *
 
 roster_blueprint = Blueprint('roster', __name__)
 
 @roster_blueprint.route('/rosters', methods=['GET'])
-@require_auth
 def get_all_rosters_route():
     try:
-        user_type = 'business' if is_business_user(g.user_id) else 'employee'
+        user_type = request.headers.get('User-Type')
         rosters = get_all_rosters(user_type)
         return jsonify(rosters), 200 
-    except Exception:
-        traceback.print_exc()
-        return jsonify({'error': 'Internal Server Error'}), 500
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 
 
 
 @roster_blueprint.route('/rosters/<roster_id>', methods=['GET'])
-@require_auth
 def get_roster_by_id_route(roster_id):
     try:
         roster = get_roster(roster_id)
         if roster:
-            if not is_business_user(g.user_id) and not roster.get('is_published'):
-                return jsonify({'error': 'Roster not found'}), 404
             return roster, 200
         else:
             return jsonify({'error': 'Roster not found'}), 404
@@ -37,22 +31,23 @@ def get_roster_by_id_route(roster_id):
 
 
 @roster_blueprint.route('/rosters', methods=['POST'])
-@require_business
 def create_roster_route():
     try:
-        roster_data = request.json
-        if not isinstance(roster_data, dict):
-            return jsonify({'error': 'JSON object required'}), 400
+        roster_data = request.json    
         roster = roster_data.get('roster')
         shifts_id = roster_data.get('shifts_id')
         employee_ids = roster_data.get('employee_ids')
-        if not isinstance(roster, dict) or not shifts_id or not employee_ids:
-            return jsonify({'error': 'roster, shifts_id and employee_ids are required'}), 400
 
-        response_data, status_code = generate_roster_service(
-            roster, shifts_id, employee_ids
-        )
-        return jsonify(response_data), status_code
+        roster_id, status_code = generate_roster_service(roster, shifts_id, employee_ids)
+        if status_code == 201:
+            print("We have big sucess")
+        else:
+            print("Roster creation failed.")
+
+        print("Finished making roster")
+        response_data = roster_id
+                
+        return response_data, 201
 
     except Exception as e:
         traceback.print_exc()
@@ -61,7 +56,6 @@ def create_roster_route():
 
 
 @roster_blueprint.route('/rosters/<string:roster_id>', methods=['PUT'])
-@require_business
 def soft_delete_roster_route(roster_id):
     response_data, status_code = soft_delete_roster(roster_id)
     if status_code == 200:
@@ -74,7 +68,6 @@ def soft_delete_roster_route(roster_id):
 
 
 @roster_blueprint.route('/rosters/export', methods=['POST'])
-@require_business
 def export_roster_route():
     try:
         roster_data = request.json
@@ -96,16 +89,15 @@ def export_roster_route():
 
 
 @roster_blueprint.route('/rosters/save', methods=['POST'])
-@require_business
 def save_roster_route():
     try:
         roster_data = request.json
-        if not isinstance(roster_data, dict):
-            return jsonify({'error': 'JSON object required'}), 400
         roster_id, status_code = create_roster(roster_data)
-        if status_code == 201:
+        print(roster_id)
+        if roster_id:
             return jsonify({'roster_id': roster_id}), 200
-        return jsonify(roster_id), status_code
+        else:
+            return jsonify({'error': 'Failed to save roster'}), 500
     except Exception as e:
         traceback.print_exc()
         print(f"Exception: {e}")
@@ -114,12 +106,15 @@ def save_roster_route():
 
 
 @roster_blueprint.route('/rosters/publish/<roster_id>', methods=['PUT'])
-@require_business
 def publish_roster_route(roster_id):
     print("trying to publishing roster")
     try:
-        publish_result, status_code = publish_roster(roster_id)
-        return jsonify(publish_result), status_code
+        publish_result = publish_roster(roster_id)
+        
+        if publish_result:
+            return jsonify({'message': 'Roster published successfully'}), 200
+        else:
+            return jsonify({'error': 'Failed to publish roster or roster not found'}), 404
     except Exception as e:
         traceback.print_exc()
         print(f"Exception: {e}")

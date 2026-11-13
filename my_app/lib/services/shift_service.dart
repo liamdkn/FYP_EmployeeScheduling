@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:my_app/constants.dart';
 import 'package:my_app/models/shift_model.dart';
-import 'package:my_app/services/api_headers.dart';
 
 class ShiftService {
   static const String shiftsEndpoint = "/shifts";
@@ -15,7 +14,7 @@ class ShiftService {
       final response = await http.post(
         Uri.parse('$APIURI$shiftsEndpoint'),
         body: jsonEncode(shiftsJsonList),
-        headers: await authenticatedHeaders(json: true),
+        headers: {'Content-Type': 'application/json'},
       );
 
       if (response.statusCode == 201) {

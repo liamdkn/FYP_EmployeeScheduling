@@ -1,16 +1,14 @@
-from flask import Blueprint, g, jsonify, request
-from app.auth import require_auth, require_business
+from flask import Blueprint, jsonify, request
 from app.services.requests_service import *
 import traceback 
 
 request_blueprint = Blueprint('requests', __name__)
 
 @request_blueprint.route('/requests', methods=['POST'])
-@require_auth
 def create_request_route():
     try:
         request_data = request.json
-        user_id = g.user_id
+        user_id = request.headers.get('User-id')
 
         response_data = create_request(request_data, user_id)
         return jsonify(response_data), 201
@@ -21,10 +19,9 @@ def create_request_route():
 
 
 @request_blueprint.route('/requests', methods=['GET'])
-@require_auth
 def get_requests_route():
     try:
-        user_id = g.user_id
+        user_id = request.headers.get('User-id')
         requests_data = get_all_requests(user_id)
         requests_dict = [request.to_dict() for request in requests_data]
         return jsonify(requests_dict), 200
@@ -34,7 +31,6 @@ def get_requests_route():
 
 
 @request_blueprint.route('/requests/approve/<string:request_id>', methods=['PUT'])
-@require_business
 def approve_request_route(request_id):
     try:
         response_data = approve_request(request_id)
@@ -45,7 +41,6 @@ def approve_request_route(request_id):
         return jsonify({'error': 'Internal Server Error'}), 500
 
 @request_blueprint.route('/requests/deny/<string:request_id>', methods=['PUT'])
-@require_business
 def deny_request_route(request_id):
     try:
         response_data = deny_request(request_id)

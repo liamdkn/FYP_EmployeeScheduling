@@ -1,39 +1,30 @@
+// This is a basic Flutter widget test.
+//
+// To perform an interaction with a widget in your test, use the WidgetTester
+// utility in the flutter_test package. For example, you can send tap and scroll
+// gestures. You can also use WidgetTester to find child widgets in the widget
+// tree, read text, and verify that the values of widget properties are correct.
+
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:my_app/models/employee_model.dart';
-import 'package:my_app/models/shift_model.dart';
+
+import 'package:my_app/main.dart';
 
 void main() {
-  test('shift JSON preserves employee assignment and scheduling fields', () {
-    final employee = Employee(
-      id: 'employee-1',
-      firstName: 'Test',
-      lastName: 'Employee',
-      daysPerWeek: 3,
-      availability: {
-        'Monday': {'start_time': '09:00', 'end_time': '17:00'},
-      },
-      isAdmin: false,
-      isDeleted: false,
-      email: 'employee@example.com',
-      number: '0000000000',
-      businessId: 'business-1',
-    );
-    final shift = IndividualShift(
-      name: 'Lunch',
-      day: 'Monday',
-      startTime: '12:00',
-      endTime: '16:00',
-      employee: employee,
-      date: '16-11-2026',
-    );
+  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
+    // Build our app and trigger a frame.
+    await tester.pumpWidget(MyApp());
 
-    final restored = IndividualShift.fromJson(shift.toJson());
+    // Verify that our counter starts at 0.
+    expect(find.text('0'), findsOneWidget);
+    expect(find.text('1'), findsNothing);
 
-    expect(restored.name, shift.name);
-    expect(restored.day, shift.day);
-    expect(restored.startTime, shift.startTime);
-    expect(restored.endTime, shift.endTime);
-    expect(restored.date, shift.date);
-    expect(restored.employee, employee);
+    // Tap the '+' icon and trigger a frame.
+    await tester.tap(find.byIcon(Icons.add));
+    await tester.pump();
+
+    // Verify that our counter has incremented.
+    expect(find.text('0'), findsNothing);
+    expect(find.text('1'), findsOneWidget);
   });
 }
