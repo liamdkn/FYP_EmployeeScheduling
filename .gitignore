@@ -1,32 +1,36 @@
-# Ignore compiled Python files
-*.pyc
+# Local secrets and credentials
+.env
+.env.*
+!.env.example
+*firebase-adminsdk*.json
+*service-account*.json
+*.pem
+*.p12
 
-# Ignore __pycache__ directories
+# Python
 __pycache__/
-
-# Ignore system-specific files
-.DS_Store
-
-# Ignore specific files or directories
-my_app/lib/views/Template.txt
-
-# Ignore __init__.py files
-
-
-python-flask-api/app/routes/__pycache__/shift_routes.cpython-39.pyc
-
+*.py[cod]
+.venv/
 venv/
+.pytest_cache/
 
-my_app/assets/*
+# Flutter and Dart
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+build/
+my_app/.firebase/
 
-my_app/ios/*
+# Generated local output
+python-flask-api/roster_generation_log.txt
+python-flask-api/weekly_roster_export.csv
 
-my_app(old)/*
+# Editors and operating systems
+.DS_Store
+.idea/
+*.iml
 
-python-flask-api/rostergenerator2-firebase-adminsdk-nu4ix-f5e7b904a7.json
-
-my_app/macos/*
-
-my_app/android/*
-
-my_app/.firebase/hosting.YnVpbGQvd2Vi.cache
+# Historical local-only paths
+my_app/lib/views/Template.txt
+my_app(old)/

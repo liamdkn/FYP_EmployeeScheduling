@@ -1,23 +1,18 @@
 import 'dart:convert';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:http/http.dart' as http;
 import 'package:my_app/constants.dart';
 import 'package:my_app/models/employee_request_model.dart';
+import 'package:my_app/services/api_headers.dart';
 
 class RequestService {
   static const String requestsEndpoint = '/requests';
 
   Future<void> createTimeOffRequest(TimeOffRequest request) async {
-    final FirebaseAuth _auth = FirebaseAuth.instance;
-    final userId = _auth.currentUser?.uid;
     try {
       final response = await http.post(
         Uri.parse('$APIURI$requestsEndpoint'),
         body: jsonEncode(request.toJson()),
-        headers: {
-          'Content-Type': 'application/json',
-          'User-id': userId!,
-        },
+        headers: await authenticatedHeaders(json: true),
       );
 
       if (response.statusCode == 201) {
@@ -34,12 +29,9 @@ class RequestService {
     try {
       print("DEBUG: Getting all requests for user:");
       print(userId);
-      final Map<String, String> headers = {
-        'User-id': userId,
-      };
       final response = await http.get(
         Uri.parse('$APIURI$requestsEndpoint'),
-        headers: headers,
+        headers: await authenticatedHeaders(),
       );
 
       if (response.statusCode == 200) {
@@ -66,7 +58,7 @@ class RequestService {
       final response = await http.put(
         Uri.parse('$APIURI$requestsEndpoint/approve/$requestId'),
         body: jsonEncode({'status': 'approved'}),
-        headers: {'Content-Type': 'application/json'},
+        headers: await authenticatedHeaders(json: true),
       );
 
       if (response.statusCode == 200) {
@@ -84,7 +76,7 @@ class RequestService {
       final response = await http.put(
         Uri.parse('$APIURI$requestsEndpoint/deny/$requestId'),
         body: jsonEncode({'status': 'denied'}),
-        headers: {'Content-Type': 'application/json'},
+        headers: await authenticatedHeaders(json: true),
       );
 
       if (response.statusCode == 200) {

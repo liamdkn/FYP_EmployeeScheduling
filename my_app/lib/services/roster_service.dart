@@ -2,14 +2,17 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:my_app/constants.dart';
 import 'package:my_app/models/roster_model.dart';
+import 'package:my_app/services/api_headers.dart';
 
 class RosterService {
   static const String rosterEndpoint = "/rosters";
 
   Future<Roster> fetchRoster(String rosterId) async {
     try {
-      final response =
-          await http.get(Uri.parse('$APIURI$rosterEndpoint/$rosterId'));
+      final response = await http.get(
+        Uri.parse('$APIURI$rosterEndpoint/$rosterId'),
+        headers: await authenticatedHeaders(),
+      );
 
       if (response.statusCode == 200) {
         final Map<String, dynamic> rosterData = jsonDecode(response.body);
@@ -28,13 +31,9 @@ class RosterService {
 
   Future<List<Roster>> fetchAllRosters(userType) async {
     try {
-      final Map<String, String> headers = {
-        'User-Type': userType,
-      };
-
       final response = await http.get(
         Uri.parse('$APIURI$rosterEndpoint'),
-        headers: headers,
+        headers: await authenticatedHeaders(),
       );
 
       if (response.statusCode == 200) {
@@ -69,7 +68,7 @@ class RosterService {
       final response = await http.post(
         Uri.parse('$APIURI$rosterEndpoint'),
         body: jsonEncode(requestData),
-        headers: {'Content-Type': 'application/json'},
+        headers: await authenticatedHeaders(json: true),
       );
       if (response.statusCode == 201) {
         print('Roster generated successfully');
@@ -91,7 +90,7 @@ class RosterService {
       final response = await http.post(
         Uri.parse('$APIURI$rosterEndpoint/export'),
         body: jsonEncode(roster.toJson()),
-        headers: {'Content-Type': 'application/json'},
+        headers: await authenticatedHeaders(json: true),
       );
 
       if (response.statusCode == 200) {
@@ -110,7 +109,7 @@ class RosterService {
   Future<void> deleteRoster(String rosterId) async {
     final response = await http.put(
       Uri.parse('$APIURI$rosterEndpoint/$rosterId'),
-      headers: {'Content-Type': 'application/json'},
+      headers: await authenticatedHeaders(json: true),
     );
 
     if (response.statusCode == 200) {
@@ -128,7 +127,7 @@ class RosterService {
       final response = await http.post(
         Uri.parse('$APIURI$rosterEndpoint/save'),
         body: jsonEncode(requestData),
-        headers: {'Content-Type': 'application/json'},
+        headers: await authenticatedHeaders(json: true),
       );
 
       if (response.statusCode == 200) {
@@ -152,7 +151,7 @@ class RosterService {
     try {
       final response = await http.put(
         Uri.parse('$APIURI$rosterEndpoint/publish/$rosterId'),
-        headers: {'Content-Type': 'application/json'},
+        headers: await authenticatedHeaders(json: true),
       );
 
       if (response.statusCode == 200) {

@@ -7,6 +7,7 @@ import 'package:my_app/models/employee_model.dart';
 import 'package:my_app/services/business_service.dart';
 import 'package:my_app/services/employee_service.dart';
 import 'package:http/http.dart' as http;
+import 'package:my_app/services/api_headers.dart';
 
 class UserAuthProvider extends ChangeNotifier {
   static const String userEndpoint = "/user";
@@ -56,7 +57,10 @@ class UserAuthProvider extends ChangeNotifier {
 
   Future<String?> getUserType(String? userId) async {
     print("Getting the type for user: ");
-    final response = await http.get(Uri.parse('$APIURI$userEndpoint/$userId'));
+    final response = await http.get(
+      Uri.parse('$APIURI$userEndpoint/$userId'),
+      headers: await authenticatedHeaders(),
+    );
     print(response.body);
     if (response.statusCode == 200) {
       return json.decode(response.body)['user_type'];

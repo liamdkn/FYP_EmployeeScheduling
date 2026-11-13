@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:my_app/constants.dart';
 import 'package:my_app/models/business_model.dart';
+import 'package:my_app/services/api_headers.dart';
 
 class BusinessService {
   String businessEndpoint = "/business";
@@ -12,7 +13,7 @@ class BusinessService {
     final response = await http.post(
       Uri.parse('$APIURI$businessEndpoint'),
       body: jsonEncode(businessData),
-      headers: {'Content-Type': 'application/json'},
+      headers: await authenticatedHeaders(json: true),
     );
     print(businessData);
     print(response.body);
@@ -24,7 +25,10 @@ class BusinessService {
   }
 
   Future<List<Business>> getBusinesses() async {
-    final response = await http.get(Uri.parse('$APIURI$businessEndpoint'));
+    final response = await http.get(
+      Uri.parse('$APIURI$businessEndpoint'),
+      headers: await authenticatedHeaders(),
+    );
     if (response.statusCode == 200) {
       final List<dynamic> jsonList = json.decode(response.body);
 
@@ -39,8 +43,10 @@ class BusinessService {
   }
 
   Future<Business?> getBusinessById(String businessId) async {
-    final response =
-        await http.get(Uri.parse('$APIURI$businessEndpoint/$businessId'));
+    final response = await http.get(
+      Uri.parse('$APIURI$businessEndpoint/$businessId'),
+      headers: await authenticatedHeaders(),
+    );
     if (response.statusCode == 200) {
       final Map<String, dynamic> jsonData = json.decode(response.body);
       final Business business = Business.fromJson(jsonData);
@@ -57,7 +63,7 @@ class BusinessService {
     final response = await http.put(
       Uri.parse('$APIURI$businessEndpoint/$businessId'),
       body: jsonEncode(businessData),
-      headers: {'Content-Type': 'application/json'},
+      headers: await authenticatedHeaders(json: true),
     );
 
     if (response.statusCode != 200) {
@@ -68,6 +74,7 @@ class BusinessService {
   Future<void> deleteBusiness(String businessId) async {
     final response = await http.delete(
       Uri.parse('$APIURI$businessEndpoint/$businessId'),
+      headers: await authenticatedHeaders(),
     );
 
     if (response.statusCode != 200) {
