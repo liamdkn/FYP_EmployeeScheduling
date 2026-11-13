@@ -51,12 +51,10 @@ def initialise_population(population_size, employees, num_shifts):
 def calculate_fitness(chromosome, individual_shifts, employees, approvedRequests):
     total_shifts = len(chromosome)
     shifts_per_day = {}
+    shifts_per_employee = MAX_SHIFTS_PER_WEEK
     numberOfConflicts = 0
 
     shifts_per_employee = {employee.id: 0 for employee in employees}
-    employee_shift_limits = {
-        employee.id: employee.days_per_week for employee in employees
-    }
 
     for i, employee_id in enumerate(chromosome):
         if i < total_shifts:
@@ -64,6 +62,8 @@ def calculate_fitness(chromosome, individual_shifts, employees, approvedRequests
             day = shift.day
             
             employee = next((emp for emp in employees if emp.id == employee_id), None)
+            emp_shifts_per_week = employee.days_per_week
+            
             # Filter approved requests for the current employee
             employee_approved_requests = [request for request in approvedRequests if request.employee_id == employee_id]
             
@@ -84,10 +84,7 @@ def calculate_fitness(chromosome, individual_shifts, employees, approvedRequests
         shifts_per_employee[employee.id] += 1
 
     # Check if an employee is working more than max_shifts_per_week days
-    shifts_penalty = sum(
-        max(0, count - employee_shift_limits[employee_id])
-        for employee_id, count in shifts_per_employee.items()
-    )
+    shifts_penalty = sum(max(0, count - emp_shifts_per_week) for count in shifts_per_employee.values())
     numberOfConflicts += shifts_penalty
 
     std_dev_shifts = pstdev(shifts_per_employee.values())
